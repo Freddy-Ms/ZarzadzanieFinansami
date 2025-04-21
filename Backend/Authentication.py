@@ -43,8 +43,8 @@ def get_decoded_token():
     if refresh_token and is_token_valid(refresh_token):
         new_access_token, new_refresh_token = generate_tokens(decoded_token['user_id'])
         decoded_token = decode_token(new_access_token)
-        response = jsonify({"message": "Tokens refreshed"})
-        response = set_tokens_in_cookies(response, new_access_token, new_refresh_token)
+        response = make_response(jsonify({"message": "Tokens refreshed"}))
+        set_tokens_in_cookies(response, new_access_token, new_refresh_token)
         return decoded_token, response
     return None, None
 
