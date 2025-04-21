@@ -43,20 +43,18 @@ class User(db.Model):
             password = data.get('password')
             email = data.get('email')
             if (not username and not email) or not password:
-                return {"message": "Missing required fields"}, 400
+                return None, {"message": "Missing required fields"}, 400
             
             if username:
                 user = User.query.filter_by(username=username).first()
-
-            if email:
+            else:
                 user = User.query.filter_by(email=email).first()
 
             if not user or not check_password_hash(user.password, password):
                 return {"message": "Invalid credentials"}, 401
 
             access_token, refresh_token = generate_tokens(user.id)
-            response = make_response(jsonify({"message": "Login successful"}))
-            response = set_tokens_in_cookies(response, access_token, refresh_token)
-            return response, 200
+
+            return (access_token, refresh_token), {"message": "Login successful"}, 200
         except Exception as e:
-            return {"message": str(e)}, 500
+            return None, {"message": str(e)}, 500

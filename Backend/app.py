@@ -1,9 +1,9 @@
 from Models import db, User
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-from Authentication import token_required
+from Authentication import token_required, set_tokens_in_cookies
 
 app = Flask(__name__)
 CORS(app)
@@ -27,7 +27,13 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    return User.login(data)
+    result, message, status_code = User.login(data)
+    if result:
+        access_token, refresh_token = result
+        response = make_response(jsonify(message))
+        set_tokens_in_cookies(response, access_token, refresh_token)
+        return response, status_code
+    return jsonify(message), status_code
 
 
 

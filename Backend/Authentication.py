@@ -31,7 +31,6 @@ def set_tokens_in_cookies(response, access_token, refresh_token):
     """Set the access and refresh tokens in the response cookies."""
     response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='None')
     response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='None')
-    return response
 
 
 def get_decoded_token():
