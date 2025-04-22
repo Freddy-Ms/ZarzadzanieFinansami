@@ -3,7 +3,7 @@
 ## 1. Create a virtual environment and install the required dependencies:
 
    ```sh
-   python -m venv env
+   py -3.12 -m venv env
    env/Scripts/activate
    pip install -r requirements.txt
    ```
