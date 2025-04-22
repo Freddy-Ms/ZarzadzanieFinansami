@@ -2,6 +2,7 @@ from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from Authentication import generate_tokens, set_tokens_in_cookies
 from flask import request, make_response, jsonify
+from Functions import handle_household_ownership_on_delete
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -72,6 +73,7 @@ class User(db.Model):
             if not user:
                 return {"message": "User not found"}, 404
 
+            handle_household_ownership_on_delete(user_id)
             db.session.delete(user)
             db.session.commit()
             return {"message": "User deleted successfully"}, 200
