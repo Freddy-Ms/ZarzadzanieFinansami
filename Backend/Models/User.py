@@ -80,3 +80,30 @@ class User(db.Model):
         except Exception as e:
             db.session.rollback()
             return {"message": str(e)}, 500
+        
+    @staticmethod
+    def edit(user_id, data):
+        """Edit a user with the provided user_id and data.
+        The data should include 'username', 'email', and/or 'password'."""
+        try:
+            user = User.query.get(user_id)
+            if not user:
+                return {"message": "User not found"}, 404
+
+            username = data.get('username')
+            email = data.get('email')
+            password = data.get('password')
+
+            if username:
+                user.username = username
+            if email:
+                user.email = email
+            if password:
+                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                user.password = hashed_password
+
+            db.session.commit()
+            return {"message": "User updated successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": str(e)}, 500

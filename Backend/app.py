@@ -53,6 +53,12 @@ def delete_user():
         return response
     return jsonify(message), status_code
 
+@app.route('/user/edit', methods=['POST'])
+@token_required
+def edit_user():
+    data = request.get_json()
+    message, status_code = User.edit(g.user_id, data)
+    return jsonify(message), status_code
 
 if __name__ == '__main__':
     app.run(debug=True)
