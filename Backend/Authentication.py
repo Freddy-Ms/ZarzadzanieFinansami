@@ -1,4 +1,4 @@
-from flask import request, jsonify, make_response
+from flask import request, jsonify, make_response, g
 import jwt
 import datetime
 from functools import wraps
@@ -16,7 +16,8 @@ def token_required(func):
         if not decoded_token:
             return jsonify({"error": "Unvalid tokens"}), 401
 
-        result = func(token = decoded_token, *args, **kwargs)
+        g.user_id = decoded_token['user_id']
+        result = func(*args, **kwargs)
 
         if response:
             response.set_data(result.get_data())
@@ -41,7 +42,8 @@ def get_decoded_token():
         return decoded_token, None
     refresh_token = request.cookies.get('refresh_token')
     if refresh_token and is_token_valid(refresh_token):
-        new_access_token, new_refresh_token = generate_tokens(decoded_token['user_id'])
+        decoded_refresh = decode_token(refresh_token)
+        new_access_token, new_refresh_token = generate_tokens(decoded_refresh['user_id'])
         decoded_token = decode_token(new_access_token)
         response = make_response(jsonify({"message": "Tokens refreshed"}))
         set_tokens_in_cookies(response, new_access_token, new_refresh_token)

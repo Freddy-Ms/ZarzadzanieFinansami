@@ -56,7 +56,7 @@ class User(db.Model):
                 user = User.query.filter_by(email=email).first()
 
             if not user or not check_password_hash(user.password, password):
-                return {"message": "Invalid credentials"}, 401
+                return None, {"message": "Invalid credentials"}, 401
 
             access_token, refresh_token = generate_tokens(user.id)
 

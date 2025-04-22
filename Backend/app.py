@@ -1,5 +1,5 @@
 from Models import db, User
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, g
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -44,9 +44,8 @@ def logout():
 
 @app.route('/user/delete', methods=['POST'])
 @token_required
-def delete_user(token):
-    user_id = token['user_id']
-    message, status_code = User.delete(user_id)
+def delete_user():
+    message, status_code = User.delete(g.user_id)
     if status_code == 200:
         response = make_response(jsonify(message), status_code)
         response.delete_cookie('access_token', secure=True, samesite='None')
