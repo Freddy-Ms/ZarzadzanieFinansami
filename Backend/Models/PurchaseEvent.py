@@ -5,8 +5,8 @@ class PurchaseEvent(db.Model):
     __tablename__ = 'purchase_event'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    household_id = db.Column(db.Integer, db.ForeignKey('household.id', ondelete='SET NULL'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+    household_id = db.Column(db.Integer, db.ForeignKey('household.id', ondelete='CASCADE'), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     receipt = db.Column(db.LargeBinary, nullable=True)
 

@@ -12,6 +12,8 @@ class User(db.Model):
 
     @staticmethod
     def register(data):
+        """"Register a new user with the provided data.
+        The data should include 'username', 'email', and 'password'."""
         try:
             username = data.get('username')
             email = data.get('email')
@@ -38,6 +40,9 @@ class User(db.Model):
 
     @staticmethod
     def login(data):
+        """Login a user with the provided data.
+        The data should include 'username' or 'email', and 'password'.
+        Returns a tuple of (access_token, refresh_token), a message and status code."""
         try:
             username = data.get('username')
             password = data.get('password')
@@ -58,3 +63,18 @@ class User(db.Model):
             return (access_token, refresh_token), {"message": "Login successful"}, 200
         except Exception as e:
             return None, {"message": str(e)}, 500
+        
+    @staticmethod
+    def delete(user_id):
+        """Delete a user with the provided user_id."""
+        try:
+            user = User.query.get(user_id)
+            if not user:
+                return {"message": "User not found"}, 404
+
+            db.session.delete(user)
+            db.session.commit()
+            return {"message": "User deleted successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": str(e)}, 500
