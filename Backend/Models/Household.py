@@ -1,4 +1,4 @@
-from . import db
+from . import db, User, HouseholdUser
 import datetime
 import jwt
 from dotenv import load_dotenv
@@ -19,8 +19,11 @@ class Household(db.Model):
         """Create a new household with the provided data.
         The data should include 'name'."""
         try:
+            household_name = data.get('name')
+            if not household_name:
+                return {"message": "Household name is required"}, 400
             household = Household(
-                name = data.get('name'),
+                name = household_name,
                 ownership = user_id
             )
             db.session.add(household)
@@ -67,4 +70,63 @@ class Household(db.Model):
             db.session.rollback()
             return {"message": str(e)}, 500
         
+    @staticmethod
+    def invite_user_to_household(user_id, data):
+        """Create an invite token for a user to join a household.
+        The data should include 'household_id' and 'email'."""
+        try:
+            household_id = data.get('household_id')
+            email = data.get('email')
+            household = Household.query.filter_by(id = household_id, ownership = user_id).first()
+            if not household:
+                return {"message": "Household not found"}, 404
+
+            token = jwt.encode({
+                'household_id': household_id,
+                'email': email,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            }, SECRET_KEY, algorithm='HS256')
+
+            return {"message": "Token created successfully!", "token": token}, 200
+        except Exception as e:
+            return {"message": str(e)}, 500
+
+    @staticmethod
+    def accept_invite(user_id, data):
+        """Accept an invite to join a household.
+        The data should include 'token'."""
+        try:
+            token = data.get('token')
+            if not token:
+                return {"message": "Token is required"}, 400
+
+            decoded_token = decode_token(token)
+            if not decoded_token:
+                return {"message": "Invalid or expired token"}, 400
+
+            household_id = decoded_token['household_id']
+            email = decoded_token['email']
+            current_user = User.query.filter_by(id=user_id).first()
+            if current_user.email != email:
+                return {"message": "You are not authorized to accept this invite"}, 403
+            
+            household = Household.query.filter_by(id=household_id).first()
+            
+            if not household:
+                return {"message": "Household not found"}, 404
+            
+            exists = HouseholdUser.query.filter_by(household_id=household_id, user_id=user_id).first()
+            if exists:
+                return {"message": "You are already a member of this household"}, 400
+            
+            value = HouseholdUser(
+                household_id = household_id,
+                user_id = user_id
+            )
+            db.session.add(value)
+            db.session.commit()
+            return {"message": "Invite accepted successfully!"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": str(e)}, 500
     
