@@ -35,8 +35,8 @@ class Household(db.Model):
             )
 
             db.session.add(household)
-            db.session.commit() 
-            
+            db.session.flush() 
+
             household_user = HouseholdUser(
                 household_id = household.id,
                 user_id = user_id
