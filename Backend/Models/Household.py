@@ -1,4 +1,6 @@
-from . import db, User, HouseholdUser
+from . import db
+from .HouseholdUser import HouseholdUser
+from .User import User
 import datetime
 import jwt
 from dotenv import load_dotenv
@@ -22,11 +24,24 @@ class Household(db.Model):
             household_name = data.get('name')
             if not household_name:
                 return {"message": "Household name is required"}, 400
+            user_household = Household.query.filter_by(ownership=user_id).first()
+
+            if user_household:
+                return {"message": "You already own a household"}, 400
+            
             household = Household(
                 name = household_name,
                 ownership = user_id
             )
+
             db.session.add(household)
+            db.session.commit() 
+            
+            household_user = HouseholdUser(
+                household_id = household.id,
+                user_id = user_id
+            )
+            db.session.add(household_user)
             db.session.commit()
             return {"message": "Household created successfully"}, 201
         except Exception as e:
@@ -71,7 +86,7 @@ class Household(db.Model):
             return {"message": str(e)}, 500
         
     @staticmethod
-    def invite_user_to_household(user_id, data):
+    def invite_user(user_id, data):
         """Create an invite token for a user to join a household.
         The data should include 'household_id' and 'email'."""
         try:
@@ -106,7 +121,9 @@ class Household(db.Model):
 
             household_id = decoded_token['household_id']
             email = decoded_token['email']
+
             current_user = User.query.filter_by(id=user_id).first()
+
             if current_user.email != email:
                 return {"message": "You are not authorized to accept this invite"}, 403
             
