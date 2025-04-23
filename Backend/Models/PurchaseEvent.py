@@ -9,6 +9,7 @@ class PurchaseEvent(db.Model):
     household_id = db.Column(db.Integer, db.ForeignKey('household.id', ondelete='CASCADE'), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     receipt = db.Column(db.LargeBinary, nullable=True)
+    name = db.Column(db.String(255), nullable=True)
 
     __table_args__ = (
         db.CheckConstraint(
