@@ -1,4 +1,11 @@
 from . import db
+import datetime
+import jwt
+from dotenv import load_dotenv
+import os
+from Authentication import decode_token
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 class Household(db.Model):
     __tablename__ = 'household'
 
@@ -9,6 +16,8 @@ class Household(db.Model):
 
     @staticmethod
     def create(user_id, data):
+        """Create a new household with the provided data.
+        The data should include 'name'."""
         try:
             household = Household(
                 name = data.get('name'),
@@ -23,6 +32,8 @@ class Household(db.Model):
         
     @staticmethod
     def edit(user_id, data):
+        """Edit an existing household with the provided data.
+        The data should include 'household_id' and 'name'."""
         try:
             household_id = data.get('household_id')
             household_name = data.get('name')
@@ -41,6 +52,8 @@ class Household(db.Model):
         
     @staticmethod
     def delete(user_id, data):
+        """Delete an existing household with the provided data.
+        The data should include 'household_id'."""
         try:
             household_id = data.get('household_id')
             household = Household.query.filter_by(id=household_id, ownership=user_id).first()
@@ -53,3 +66,5 @@ class Household(db.Model):
         except Exception as e:
             db.session.rollback()
             return {"message": str(e)}, 500
+        
+    

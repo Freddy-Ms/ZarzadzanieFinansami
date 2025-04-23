@@ -82,6 +82,19 @@ def delete_household():
     message, status_code = Household.delete(g.user_id, data)
     return jsonify(message), status_code
 
+@app.route('/household/create_invite_token', methods=['POST'])
+@token_required
+def invite_user_to_household():
+    data = request.get_json()
+    message, status_code = Household.invite_user(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/household/accept_invite', methods=['POST'])
+@token_required
+def accept_invite():
+    data = request.get_json()
+    message, status_code = Household.accept_invite(g.user_id, data)
+    return jsonify(message), status_code
 
 if __name__ == '__main__':
     app.run(debug=True)
