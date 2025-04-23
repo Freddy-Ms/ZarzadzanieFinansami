@@ -3,7 +3,7 @@ from Models import db, HouseholdUser, Household, User
 
 def handle_household_ownership_on_delete(user_id):
     """Handle the transfer of household ownership or deletion of households when a user is deleted."""
-    households_created = Household.query.filter_by(created_by=user_id).all()
+    households_created = Household.query.filter_by(ownership=user_id).all()
 
     for household in households_created:
         member_ids = HouseholdUser.query.filter(

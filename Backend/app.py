@@ -1,4 +1,4 @@
-from Models import db, User
+from Models import db, User, Household
 from flask import Flask, request, jsonify, make_response, g
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -59,6 +59,29 @@ def edit_user():
     data = request.get_json()
     message, status_code = User.edit(g.user_id, data)
     return jsonify(message), status_code
+
+
+@app.route('/household/create', methods=['POST'])
+@token_required
+def create_household():
+    data = request.get_json()
+    message, status_code = Household.create(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/household/edit', methods=['POST'])
+@token_required
+def edit_household():
+    data = request.get_json()
+    message, status_code = Household.edit(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/household/delete', methods=['POST'])
+@token_required
+def delete_household():
+    data = request.get_json()
+    message, status_code = Household.delete(g.user_id, data)
+    return jsonify(message), status_code
+
 
 if __name__ == '__main__':
     app.run(debug=True)
