@@ -103,8 +103,15 @@ def accept_invite():
 
 @app.route('/household/get', methods=['GET'])
 @token_required
-def get_household():
-    message, status_code = Household.get_household(g.user_id)
+def get_households():
+    message, status_code = Household.get_user_households(g.user_id)
+    return jsonify(message), status_code
+
+@app.route('/household/leave', methods=['DELETE'])
+@token_required
+def leave_household():
+    data = request.get_json()
+    message, status_code = Household.leave_household(g.user_id, data)
     return jsonify(message), status_code
 
 if __name__ == '__main__':

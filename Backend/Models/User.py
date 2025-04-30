@@ -2,7 +2,7 @@ from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from Authentication import generate_tokens, set_tokens_in_cookies
 from flask import request, make_response, jsonify
-from Functions import handle_household_ownership_on_delete
+from Functions import handle_household_ownership_on_delete_or_leave
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -10,6 +10,19 @@ class User(db.Model):
     username = db.Column(db.String(255), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
+
+    household_memberships = db.relationship(
+        'HouseholdUser',
+        back_populates='user',
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
+
+    owned_household = db.relationship(
+        'Household',
+        back_populates='owner',
+        foreign_keys='Household.ownership'
+    )
 
     def to_dict(self):
         return {
@@ -80,7 +93,7 @@ class User(db.Model):
             if not user:
                 return {"message": "User not found"}, 404
 
-            handle_household_ownership_on_delete(user_id)
+            handle_household_ownership_on_delete_or_leave(user_id)
             db.session.delete(user)
             db.session.commit()
             return {"message": "User deleted successfully"}, 200
@@ -123,10 +136,6 @@ class User(db.Model):
             if not user:
                 return {"message": "User not found"}, 404
 
-            return {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email
-            }, 200
+            return user.to_dict(), 200
         except Exception as e:
             return {"message": str(e)}, 500

@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 from .Category import Category
-from . Household import Household
+from .Household import Household 
 from .HouseholdUser import HouseholdUser
 from .Product import Product
 from .PurchasedProduct import PurchasedProduct

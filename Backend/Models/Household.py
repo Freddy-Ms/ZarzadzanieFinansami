@@ -6,6 +6,7 @@ import jwt
 from dotenv import load_dotenv
 import os
 from Authentication import decode_token
+from Functions import handle_household_ownership_on_delete_or_leave
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 class Household(db.Model):
@@ -15,7 +16,24 @@ class Household(db.Model):
     name = db.Column(db.String(255), nullable=False)
     ownership = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
 
+    owner = db.relationship('User', back_populates='owned_household', foreign_keys=[ownership])
+    members = db.relationship(
+        'HouseholdUser',
+        back_populates='household',
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
 
+    def to_dict(self, current_user_id):
+        """Convert the household object to a dictionary."""
+        household_users = HouseholdUser.query.filter_by(household_id=self.id).all()
+        return {
+            'id': self.id,
+            'name': self.name,
+            'owner_username': self.owner.username,
+            'is_owner': self.ownership == current_user_id,
+            'members': [u.user.username for u in household_users]
+        }
     @staticmethod
     def create(user_id, data):
         """Create a new household with the provided data.
@@ -148,20 +166,30 @@ class Household(db.Model):
             return {"message": str(e)}, 500
         
     @staticmethod
-    def get_household(user_id):
-        """Get the household of a user."""
+    def get_user_households(user_id):
+        """Get all households of a user."""
         try:
-            household = Household.query.filter_by(ownership=user_id).first()
-            if not household:
-                return {"message": "Household not found"}, 404
+            households = HouseholdUser.query.filter_by(user_id=user_id).all()
+            if not households:
+                return {"message": "No households found"}, 404
 
-            return {
-                "id": household.id,
-                "name": household.name,
-                "ownership": household.ownership
-            }, 200
+            return [house.household.to_dict(user_id) for house in households], 200
         except Exception as e:
             return {"message": str(e)}, 500
-        
-
     
+    @staticmethod
+    def leave_household(user_id, data):
+        """Leave a household.
+        The data should include 'household_id'."""
+        try:
+            household_id = data.get('household_id')
+            household_user = HouseholdUser.query.filter_by(household_id=household_id, user_id=user_id).first()
+            if not household_user:
+                return {"message": "You are not a member of this household"}, 404
+            
+            handle_household_ownership_on_delete_or_leave(user_id)
+            
+            return {"message": "Left household successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": str(e)}, 500
