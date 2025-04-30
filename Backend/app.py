@@ -114,5 +114,12 @@ def leave_household():
     message, status_code = Household.leave_household(g.user_id, data)
     return jsonify(message), status_code
 
+@app.route('/household/kick', methods=['POST'])
+@token_required
+def kick_user_from_household():
+    data = request.get_json()
+    message, status_code = Household.kick_user(g.user_id, data)
+    return jsonify(message), status_code
+
 if __name__ == '__main__':
     app.run(debug=True)
