@@ -60,6 +60,11 @@ def edit_user():
     message, status_code = User.edit(g.user_id, data)
     return jsonify(message), status_code
 
+@app.route('/user/get', methods=['GET'])
+@token_required
+def get_user():
+    message, status_code = User.get_user(g.user_id)
+    return jsonify(message), status_code
 
 @app.route('/household/create', methods=['POST'])
 @token_required
@@ -94,6 +99,12 @@ def invite_user_to_household():
 def accept_invite():
     data = request.get_json()
     message, status_code = Household.accept_invite(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/household/get', methods=['GET'])
+@token_required
+def get_household():
+    message, status_code = Household.get_household(g.user_id)
     return jsonify(message), status_code
 
 if __name__ == '__main__':

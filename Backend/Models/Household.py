@@ -146,4 +146,22 @@ class Household(db.Model):
         except Exception as e:
             db.session.rollback()
             return {"message": str(e)}, 500
+        
+    @staticmethod
+    def get_household(user_id):
+        """Get the household of a user."""
+        try:
+            household = Household.query.filter_by(ownership=user_id).first()
+            if not household:
+                return {"message": "Household not found"}, 404
+
+            return {
+                "id": household.id,
+                "name": household.name,
+                "ownership": household.ownership
+            }, 200
+        except Exception as e:
+            return {"message": str(e)}, 500
+        
+
     

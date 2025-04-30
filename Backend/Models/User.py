@@ -11,6 +11,13 @@ class User(db.Model):
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email
+        }
+    
     @staticmethod
     def register(data):
         """"Register a new user with the provided data.
@@ -106,4 +113,20 @@ class User(db.Model):
             return {"message": "User updated successfully"}, 200
         except Exception as e:
             db.session.rollback()
+            return {"message": str(e)}, 500
+        
+    @staticmethod
+    def get_user(user_id):
+        """Get a user with the provided user_id."""
+        try:
+            user = User.query.get(user_id)
+            if not user:
+                return {"message": "User not found"}, 404
+
+            return {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email
+            }, 200
+        except Exception as e:
             return {"message": str(e)}, 500
