@@ -16,7 +16,8 @@ class Household(db.Model):
     name = db.Column(db.String(255), nullable=False)
     ownership = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
 
-    owner = db.relationship('User', back_populates='owned_household', foreign_keys=[ownership])
+    owner = db.relationship('User', back_populates='owned_household', foreign_keys=[ownership]
+                            )
     members = db.relationship(
         'HouseholdUser',
         back_populates='household',
@@ -26,13 +27,12 @@ class Household(db.Model):
 
     def to_dict(self, current_user_id):
         """Convert the household object to a dictionary."""
-        household_users = HouseholdUser.query.filter_by(household_id=self.id).all()
         return {
             'id': self.id,
             'name': self.name,
             'owner_username': self.owner.username,
             'is_owner': self.ownership == current_user_id,
-            'members': [u.user.username for u in household_users]
+            'members': [member.user.username for member in self.members],
         }
     @staticmethod
     def create(user_id, data):
