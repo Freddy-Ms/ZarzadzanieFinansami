@@ -1,4 +1,4 @@
-from Models import db, User, Household
+from Models import db, User, Household, ShoppingList
 from flask import Flask, request, jsonify, make_response, g
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -33,7 +33,8 @@ def login():
         response = make_response(jsonify(message),status_code)
         set_tokens_in_cookies(response, access_token, refresh_token)
         return response
-    return jsonify(message), status_code
+    return jsonify(message), 
+    
 
 @app.route('/user/logout', methods=['POST'])
 def logout():
@@ -121,5 +122,18 @@ def kick_user_from_household():
     message, status_code = Household.kick_user(g.user_id, data)
     return jsonify(message), status_code
 
+@app.route('/shoppinglist/create', methods = ['POST'])
+@token_required
+def create_shopping_list():
+    data = request.get_json()
+    message, status_code = ShoppingList.create(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/shoppinglist/delete', methods = ['POST'])
+@token_required
+def delete_shopping_list():
+    data = request.get_json()
+    message, status_code = ShoppingList.delete(g.user_id, data)
+    return jsonify(message), status_code
 if __name__ == '__main__':
     app.run(debug=True)

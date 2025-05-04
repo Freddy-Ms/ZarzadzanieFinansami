@@ -188,7 +188,13 @@ class Household(db.Model):
             if not household_user:
                 return {"message": "You are not a member of this household"}, 404
             
-            handle_household_ownership_on_delete_or_leave(user_id)
+            is_owner = Household.query.filter_by(id=household_id, ownership=user_id).first()
+            
+            if is_owner:
+                return {"message": "You cannot leave your own household"}, 400
+            
+            db.session.delete(household_user)
+            db.session.commit()
             
             return {"message": "Left household successfully"}, 200
         except Exception as e:
