@@ -135,5 +135,13 @@ def delete_shopping_list():
     data = request.get_json()
     message, status_code = ShoppingList.delete(g.user_id, data)
     return jsonify(message), status_code
+
+@app.route('/shoppinglist/get', methods = ['GET'])
+@token_required
+def get_shopping_lists():
+    message, status_code = ShoppingList.get_user_shopping_lists(g.user_id)
+    return jsonify(message), status_code
+
+
 if __name__ == '__main__':
     app.run(debug=True)
