@@ -1,4 +1,4 @@
-from Models import db, User, Household
+from Models import db, User, Household, ShoppingList
 from flask import Flask, request, jsonify, make_response, g
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -33,7 +33,8 @@ def login():
         response = make_response(jsonify(message),status_code)
         set_tokens_in_cookies(response, access_token, refresh_token)
         return response
-    return jsonify(message), status_code
+    return jsonify(message), 
+    
 
 @app.route('/user/logout', methods=['POST'])
 def logout():
@@ -60,6 +61,11 @@ def edit_user():
     message, status_code = User.edit(g.user_id, data)
     return jsonify(message), status_code
 
+@app.route('/user/get', methods=['GET'])
+@token_required
+def get_user():
+    message, status_code = User.get_user(g.user_id)
+    return jsonify(message), status_code
 
 @app.route('/household/create', methods=['POST'])
 @token_required
@@ -95,6 +101,47 @@ def accept_invite():
     data = request.get_json()
     message, status_code = Household.accept_invite(g.user_id, data)
     return jsonify(message), status_code
+
+@app.route('/household/get', methods=['GET'])
+@token_required
+def get_households():
+    message, status_code = Household.get_user_households(g.user_id)
+    return jsonify(message), status_code
+
+@app.route('/household/leave', methods=['DELETE'])
+@token_required
+def leave_household():
+    data = request.get_json()
+    message, status_code = Household.leave_household(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/household/kick', methods=['POST'])
+@token_required
+def kick_user_from_household():
+    data = request.get_json()
+    message, status_code = Household.kick_user(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/shoppinglist/create', methods = ['POST'])
+@token_required
+def create_shopping_list():
+    data = request.get_json()
+    message, status_code = ShoppingList.create(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/shoppinglist/delete', methods = ['POST'])
+@token_required
+def delete_shopping_list():
+    data = request.get_json()
+    message, status_code = ShoppingList.delete(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/shoppinglist/get', methods = ['GET'])
+@token_required
+def get_shopping_lists():
+    message, status_code = ShoppingList.get_user_shopping_lists(g.user_id)
+    return jsonify(message), status_code
+
 
 if __name__ == '__main__':
     app.run(debug=True)

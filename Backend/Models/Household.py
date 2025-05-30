@@ -6,6 +6,7 @@ import jwt
 from dotenv import load_dotenv
 import os
 from Authentication import decode_token
+from Functions import handle_household_ownership_on_delete_or_leave
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 class Household(db.Model):
@@ -15,7 +16,25 @@ class Household(db.Model):
     name = db.Column(db.String(255), nullable=False)
     ownership = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
 
+    owner = db.relationship('User', back_populates='owned_household', foreign_keys=[ownership]
+                            )
+    members = db.relationship(
+        'HouseholdUser',
+        back_populates='household',
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
 
+    def to_dict(self, current_user_id):
+        """Convert the household object to a dictionary."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'owner_username': self.owner.username,
+            'is_owner': self.ownership == current_user_id,
+            'members': [member.user.username for member in self.members if self.ownership != current_user_id],
+        }
+    
     @staticmethod
     def create(user_id, data):
         """Create a new household with the provided data.
@@ -146,4 +165,68 @@ class Household(db.Model):
         except Exception as e:
             db.session.rollback()
             return {"message": str(e)}, 500
+        
+    @staticmethod
+    def get_user_households(user_id):
+        """Get all households of a user."""
+        try:
+            households = HouseholdUser.query.filter_by(user_id=user_id).all()
+            if not households:
+                return {"message": "No households found"}, 404
+
+            return [house.household.to_dict(user_id) for house in households], 200
+        except Exception as e:
+            return {"message": str(e)}, 500
     
+    @staticmethod
+    def leave_household(user_id, data):
+        """Leave a household.
+        The data should include 'household_id'."""
+        try:
+            household_id = data.get('household_id')
+            household_user = HouseholdUser.query.filter_by(household_id=household_id, user_id=user_id).first()
+            if not household_user:
+                return {"message": "You are not a member of this household"}, 404
+            
+            is_owner = Household.query.filter_by(id=household_id, ownership=user_id).first()
+            
+            if is_owner:
+                return {"message": "You cannot leave your own household"}, 400
+            
+            db.session.delete(household_user)
+            db.session.commit()
+            
+            return {"message": "Left household successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": str(e)}, 500
+        
+    @staticmethod
+    def kick_user(user_id, data):
+        """Kick a user from a household.
+        The data should include 'household_id' and 'user_id_to_kick'."""
+        try:
+            household_id = data.get('household_id')
+            user_id_to_kick = data.get('user_id_to_kick')
+            household = Household.query.filter_by(id=household_id, ownership=user_id).first()
+            household_owner = household.ownership
+
+            if household_owner != user_id:
+                return {"message": "You are not the owner of this household"}, 403
+            
+            if household_owner == user_id_to_kick:
+                return {"message": "You cannot kick yourself from the household"}, 400
+            
+            if not household:
+                return {"message": "Household not found or you are not the owner"}, 404
+
+            household_user = HouseholdUser.query.filter_by(household_id=household_id, user_id=user_id_to_kick).first()
+            if not household_user:
+                return {"message": "User is not a member of this household"}, 404
+
+            db.session.delete(household_user)
+            db.session.commit()
+            return {"message": "User kicked from household successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": str(e)}, 500

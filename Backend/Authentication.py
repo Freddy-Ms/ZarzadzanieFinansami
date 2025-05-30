@@ -18,6 +18,8 @@ def token_required(func):
 
         g.user_id = decoded_token['user_id']
         result = func(*args, **kwargs)
+        if isinstance(result, tuple):
+            result = make_response(result[0], result[1])
 
         if response:
             response.set_data(result.get_data())
@@ -35,30 +37,28 @@ def set_tokens_in_cookies(response, access_token, refresh_token):
 
 
 def get_decoded_token():
-    """Get the decoded token from the requeste headers or refresh it if expired."""
+    """Get the decoded token from the request cookies or refresh it if expired."""
     access_token = request.cookies.get('access_token')
-    if access_token and is_token_valid(access_token):
+
+    if access_token:
         decoded_token = decode_token(access_token)
-        return decoded_token, None
+        if decoded_token:
+            return decoded_token, None
+
     refresh_token = request.cookies.get('refresh_token')
-    if refresh_token and is_token_valid(refresh_token):
+
+    if refresh_token:
         decoded_refresh = decode_token(refresh_token)
-        new_access_token, new_refresh_token = generate_tokens(decoded_refresh['user_id'])
-        decoded_token = decode_token(new_access_token)
-        response = make_response(jsonify({"message": "Tokens refreshed"}))
-        set_tokens_in_cookies(response, new_access_token, new_refresh_token)
-        return decoded_token, response
+        if decoded_refresh:
+            new_access_token, new_refresh_token = generate_tokens(decoded_refresh['user_id'])
+            decoded_token = decode_token(new_access_token)
+
+            response = make_response(jsonify({"message": "Tokens refreshed"}))
+            set_tokens_in_cookies(response, new_access_token, new_refresh_token)
+            return decoded_token, response
+
     return None, None
 
-
-
-def is_token_valid(token):
-    """Check if the token is valid."""
-    try:
-        decoded_token = decode_token(token)
-        return True
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-        return False
 
 
 def decode_token(token):
