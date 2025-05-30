@@ -27,13 +27,17 @@ def register():
 @app.route('/user/login', methods=['POST'])
 def login():
     data = request.get_json()
-    result, message, status_code = User.login(data)
-    if result:
-        access_token, refresh_token = result
-        response = make_response(jsonify(message),status_code)
+    response_data, status_code = User.login(data)
+    
+    if "access_token" in response_data and "refresh_token" in response_data:
+        access_token = response_data.pop("access_token")
+        refresh_token = response_data.pop("refresh_token")
+        
+        response = make_response(jsonify(response_data), status_code)
         set_tokens_in_cookies(response, access_token, refresh_token)
         return response
-    return jsonify(message), 
+    
+    return jsonify(response_data), status_code
     
 
 @app.route('/user/logout', methods=['POST'])
