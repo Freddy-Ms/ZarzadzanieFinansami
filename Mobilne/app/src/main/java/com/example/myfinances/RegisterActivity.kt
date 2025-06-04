@@ -15,7 +15,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var registerButton: Button
     private val client = OkHttpClient()
-    private val BASE_URL = "http:192.168.100.6:5000"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +69,6 @@ class RegisterActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     runOnUiThread {
                         Toast.makeText(this@RegisterActivity, "Register successful!", Toast.LENGTH_SHORT).show()
-                        // Przejście do logowania lub głównej aktywności
                         val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                         startActivity(intent)
                         finish()

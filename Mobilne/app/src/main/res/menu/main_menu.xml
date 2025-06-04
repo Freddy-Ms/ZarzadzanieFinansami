@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/receipts"
+        android:title="Receipts">
+        <menu>
+            <item
+                android:id="@+id/addReceipts"
+                android:title="Add new receipt" />
+        </menu>
+    </item>
+    <item android:title="Shopping Lists">
+        <menu>
+            <item
+                android:id="@+id/createShoppingList"
+                android:title="Create shopping list" />
+            <item
+                android:id="@+id/showShoppingLists"
+                android:title="Show your shopping lists" />
+        </menu>
+    </item>
+    <item android:title="Household">
+        <menu>
+            <item
+                android:id="@+id/createHousehold"
+                android:title="Create your household"
+                android:visible="true" />
+            <item
+                android:id="@+id/editHousehold"
+                android:title="Edit your household"
+                android:visible="false" />
+            <item
+                android:id="@+id/inviteUser"
+                android:title="Create an invite"
+                android:visible="false" />
+            <item
+                android:id="@+id/joinHousehold"
+                android:title="Join to household" />
+            <item
+                android:id="@+id/showHouseholds"
+                android:title="Show households" />
+        </menu>
+    </item>
+    <item
+        android:title="Logout"
+        android:onClick="logout" />
+</menu>

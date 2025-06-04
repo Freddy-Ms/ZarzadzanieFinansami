@@ -13,6 +13,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
 
+const val BASE_URL = "http:192.168.100.6:5000"
+
+var user = ""
+
 class LoginActivity : AppCompatActivity() {
 
     // CookieJar to przechowywania cookies w pamięci
@@ -34,22 +38,17 @@ class LoginActivity : AppCompatActivity() {
         .cookieJar(cookieJar)
         .build()
 
-    private val BASE_URL = "http:192.168.100.6:5000"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_login)
 
-        val emailField = findViewById<EditText>(R.id.emailField)
         val passwordField = findViewById<EditText>(R.id.passwordField)
         val loginButton = findViewById<Button>(R.id.loginButton)
         val goToRegister = findViewById<TextView>(R.id.goToRegisterText)
 
         goToRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
-
 
         loginButton.setOnClickListener {
             val loginField = findViewById<EditText>(R.id.emailField)
@@ -71,6 +70,7 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 put("username", loginInput)
             }
+            user = loginInput
             put("password", password)
         }
 
@@ -92,7 +92,8 @@ class LoginActivity : AppCompatActivity() {
                 runOnUiThread {
                     if (response.isSuccessful) {
                         Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
-                        // TODO: Add MainActivity
+                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        finish()
                     } else {
                         Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
                     }
