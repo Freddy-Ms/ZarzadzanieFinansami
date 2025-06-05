@@ -7,6 +7,7 @@ class Subcategory(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id', ondelete='CASCADE'))
 
     products = db.relationship('Product', back_populates='subcategory')
+    category = db.relationship('Category', back_populates='subcategories')
 
     def to_dict(self):
         """Convert the subcategory object to a dictionary."""

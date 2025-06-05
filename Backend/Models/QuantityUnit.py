@@ -15,3 +15,5 @@ class QuantityUnit(db.Model):
             'name': self.name,
             'shortcut': self.shortcut
         }
+    
+    
