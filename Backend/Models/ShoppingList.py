@@ -2,6 +2,7 @@ from . import db
 from .Household import Household
 from .HouseholdUser import HouseholdUser
 from sqlalchemy import CheckConstraint
+
 class ShoppingList(db.Model):
     __tablename__ = 'shopping_list'
 
@@ -99,3 +100,6 @@ class ShoppingList(db.Model):
 
         except Exception as e:
             return {'error': str(e)}, 500
+        
+    
+    

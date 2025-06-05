@@ -5,3 +5,5 @@ class Subcategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id', ondelete='CASCADE'))
+
+    products = db.relationship('Product', back_populates='subcategory')
