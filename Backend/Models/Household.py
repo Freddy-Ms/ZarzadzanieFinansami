@@ -204,22 +204,27 @@ class Household(db.Model):
     @staticmethod
     def kick_user(user_id, data):
         """Kick a user from a household.
-        The data should include 'household_id' and 'user_id_to_kick'."""
+        The data should include 'household_id' and 'username_to_kick'."""
         try:
             household_id = data.get('household_id')
-            user_id_to_kick = data.get('user_id_to_kick')
+            username_to_kick = data.get('username_to_kick')
             household = Household.query.filter_by(id=household_id, ownership=user_id).first()
             household_owner = household.ownership
 
             if household_owner != user_id:
                 return {"message": "You are not the owner of this household"}, 403
             
-            if household_owner == user_id_to_kick:
+            if household_owner == username_to_kick:
                 return {"message": "You cannot kick yourself from the household"}, 400
             
             if not household:
                 return {"message": "Household not found or you are not the owner"}, 404
 
+            user_to_kick = User.query.filter_by(username=username_to_kick).first()
+            if not user_to_kick:
+                return {"message": "User not found"}, 404
+            
+            user_id_to_kick = user_to_kick.id
             household_user = HouseholdUser.query.filter_by(household_id=household_id, user_id=user_id_to_kick).first()
             if not household_user:
                 return {"message": "User is not a member of this household"}, 404
