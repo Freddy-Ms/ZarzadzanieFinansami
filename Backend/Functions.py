@@ -18,3 +18,14 @@ def handle_household_ownership_on_delete_or_leave(user_id):
             db.session.delete(household)
 
     db.session.commit()
+
+def does_have_permissions(user_id, shopping_list):
+    if shopping_list.household_id:
+        is_member = HouseholdUser.query.filter_by(user_id = user_id, household_id = shopping_list.household_id).first()
+        if not is_member:
+            return False
+    else:
+        if not shopping_list.user_id == user_id:
+            return False
+    
+    return True

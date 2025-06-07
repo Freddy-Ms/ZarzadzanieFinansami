@@ -1,4 +1,4 @@
-from Models import db, User, Household, ShoppingList
+from Models import db, User, Household, ShoppingList, Product
 from flask import Flask, request, jsonify, make_response, g
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -145,6 +145,29 @@ def delete_shopping_list():
 def get_shopping_lists():
     message, status_code = ShoppingList.get_user_shopping_lists(g.user_id)
     return jsonify(message), status_code
+
+@app.route('/shoppinglist/product/add', methods = ['POST'])
+@token_required
+def add_product_to_shopping_list():
+    data = request.get_json()
+    message, status_code = Product.add(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/shoppinglist/product/remove', methods = ['POST'])
+@token_required
+def remove_product_from_shopping_list():
+    data = request.get_json()
+    message, status_code = Product.remove(g.user_id, data)
+    return jsonify(message), status_code
+
+@app.route('/shoppinglist/product/edit', methods = ['POST'])
+@token_required
+def edit_product_in_shopping_list():
+    data = request.get_json()
+    message, status_code = Product.edit(g.user_id, data)
+    return jsonify(message), status_code
+
+
 
 
 if __name__ == '__main__':

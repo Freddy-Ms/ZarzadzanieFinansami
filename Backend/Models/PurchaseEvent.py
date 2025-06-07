@@ -1,6 +1,7 @@
 from . import db
 from datetime import datetime
 from sqlalchemy import CheckConstraint
+
 class PurchaseEvent(db.Model):
     __tablename__ = 'purchase_event'
 
