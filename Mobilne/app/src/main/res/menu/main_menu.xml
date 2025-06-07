@@ -7,20 +7,17 @@
         <menu>
             <item
                 android:id="@+id/addReceipts"
-                android:title="Add new receipt"
-                android:onClick="AddReceipt"/>
+                android:title="Add new receipt" />
         </menu>
     </item>
     <item android:title="Shopping Lists">
         <menu>
             <item
                 android:id="@+id/createShoppingList"
-                android:title="Create shopping list"
-                android:onClick="createShoppingList"/>
+                android:title="Create shopping list" />
             <item
                 android:id="@+id/showShoppingLists"
-                android:title="Show your shopping lists"
-                android:onClick="showShoppingLists"/>
+                android:title="Show your shopping lists" />
         </menu>
     </item>
     <item android:title="Household">
@@ -29,20 +26,15 @@
                 android:id="@+id/createHousehold"
                 android:title="Create your household"
                 android:visible="true"
-                android:onClick="createHousehold"/>
-            <item
-                android:id="@+id/inviteUser"
-                android:title="Create an invite"
-                android:visible="false"
-                android:onClick="inviteUser"/>
+                android:onClick="createHousehold" />
             <item
                 android:id="@+id/joinHousehold"
                 android:title="Join to household"
-                android:onClick="joinHousehold"/>
+                android:onClick="joinHousehold" />
             <item
                 android:id="@+id/showHouseholds"
                 android:title="Show households"
-                android:onClick="showHouseholds"/>
+                android:onClick="showHouseholds" />
         </menu>
     </item>
     <item

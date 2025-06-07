@@ -6,20 +6,63 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
 object ApiClient {
-    class SimpleCookieJar : CookieJar {
-        private val cookieStore: MutableMap<String, List<Cookie>> = HashMap()
+
+    class PersistentCookieJar(val context: android.content.Context) : CookieJar {
+        private val cookieStore = mutableMapOf<String, List<Cookie>>()
 
         override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
             cookieStore[url.host] = cookies
+
+            // zapisz do SharedPreferences
+            val prefs = context.getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+            val editor = prefs.edit()
+            for (cookie in cookies) {
+                editor.putString(cookie.name, cookie.value)
+            }
+            editor.apply()
         }
 
         override fun loadForRequest(url: HttpUrl): List<Cookie> {
-            return cookieStore[url.host] ?: emptyList()
+            val prefs = context.getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+            val cookies = mutableListOf<Cookie>()
+            val host = url.host
+
+            val access = prefs.getString("access_token", null)
+            val refresh = prefs.getString("refresh_token", null)
+
+            if (access != null) {
+                cookies.add(
+                    Cookie.Builder()
+                        .domain(host)
+                        .path("/")
+                        .name("access_token")
+                        .value(access)
+                        .httpOnly()
+                        .build()
+                )
+            }
+
+            if (refresh != null) {
+                cookies.add(
+                    Cookie.Builder()
+                        .domain(host)
+                        .path("/")
+                        .name("refresh_token")
+                        .value(refresh)
+                        .httpOnly()
+                        .build()
+                )
+            }
+
+            return cookies
         }
     }
-    val cookieJar = SimpleCookieJar()
 
-    val client: OkHttpClient = OkHttpClient.Builder()
-        .cookieJar(cookieJar)
-        .build()
+    lateinit var client: OkHttpClient
+
+    fun init(context: android.content.Context) {
+        client = OkHttpClient.Builder()
+            .cookieJar(PersistentCookieJar(context))
+            .build()
+    }
 }

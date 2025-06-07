@@ -54,7 +54,11 @@ class CreateHouseholdActivity : AppCompatActivity() {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
                     progressBar.visibility = View.GONE
-                    Toast.makeText(this@CreateHouseholdActivity, "Network error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@CreateHouseholdActivity,
+                        "Network error",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -62,13 +66,22 @@ class CreateHouseholdActivity : AppCompatActivity() {
                 runOnUiThread {
                     progressBar.visibility = View.GONE
                     if (response.isSuccessful) {
-                        Toast.makeText(this@CreateHouseholdActivity, "Household created!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@CreateHouseholdActivity,
+                            "Household created!",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                        val intent = Intent(this@CreateHouseholdActivity, MainActivity::class.java)
+                        val intent =
+                            Intent(this@CreateHouseholdActivity, EditHouseholdActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else {
-                        Toast.makeText(this@CreateHouseholdActivity, "Creation failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@CreateHouseholdActivity,
+                            "Creation failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

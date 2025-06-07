@@ -26,6 +26,10 @@ class ShowHouseholdActivity : AppCompatActivity() {
 
         listLayout = findViewById(R.id.householdListLayout)
         searchView = findViewById(R.id.searchView)
+        searchView.setIconifiedByDefault(false)
+        searchView.isFocusable = true
+        searchView.isFocusableInTouchMode = true
+        searchView.requestFocus()
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?) = false
@@ -38,6 +42,7 @@ class ShowHouseholdActivity : AppCompatActivity() {
 
         loadHouseholds()
     }
+
     private fun loadHouseholds() {
         val request = Request.Builder()
             .url("$BASE_URL/household/get")
@@ -47,7 +52,11 @@ class ShowHouseholdActivity : AppCompatActivity() {
         ApiClient.client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
-                    Toast.makeText(this@ShowHouseholdActivity, "Connection error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@ShowHouseholdActivity,
+                        "Connection error",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -71,7 +80,11 @@ class ShowHouseholdActivity : AppCompatActivity() {
 
                         displayFilteredHouseholds("")
                     } else {
-                        Toast.makeText(this@ShowHouseholdActivity, "No households found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ShowHouseholdActivity,
+                            "No households found",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -92,7 +105,8 @@ class ShowHouseholdActivity : AppCompatActivity() {
             val nameText = TextView(this).apply {
                 text = name
                 textSize = 20f
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                layoutParams =
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
 
             layout.addView(nameText)
@@ -103,7 +117,8 @@ class ShowHouseholdActivity : AppCompatActivity() {
                 val editButton = Button(this).apply {
                     text = "Edit"
                     setOnClickListener {
-                        val intent = Intent(this@ShowHouseholdActivity, EditHouseholdActivity::class.java)
+                        val intent =
+                            Intent(this@ShowHouseholdActivity, EditHouseholdActivity::class.java)
                         intent.putExtra("household_id", id)
                         intent.putExtra("household_name", name)
                         startActivity(intent)
@@ -156,17 +171,26 @@ class ShowHouseholdActivity : AppCompatActivity() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
-                    Toast.makeText(this@ShowHouseholdActivity, "Leave failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ShowHouseholdActivity, "Leave failed", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 runOnUiThread {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@ShowHouseholdActivity, "Left household", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ShowHouseholdActivity,
+                            "Left household",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         loadHouseholds()
                     } else {
-                        Toast.makeText(this@ShowHouseholdActivity, "Error: ${response.code}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ShowHouseholdActivity,
+                            "Error: ${response.code}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

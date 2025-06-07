@@ -28,6 +28,8 @@ class LoginActivity : AppCompatActivity() {
         val passwordField = findViewById<EditText>(R.id.passwordField)
         val loginButton = findViewById<Button>(R.id.loginButton)
         val goToRegister = findViewById<TextView>(R.id.goToRegisterText)
+        val sharedPreferences = getSharedPreferences("auth", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
 
         goToRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
@@ -74,6 +76,15 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
                 runOnUiThread {
                     if (response.isSuccessful) {
+                        val headers = response.headers("Set-Cookie")
+                        val accessToken = extractToken(headers, "access_token")
+                        val refreshToken = extractToken(headers, "refresh_token")
+
+                        val sharedPreferences = getSharedPreferences("auth", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        editor.putString("access_token", accessToken)
+                        editor.putString("refresh_token", refreshToken)
+                        editor.apply()
                         Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
@@ -83,5 +94,14 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun extractToken(headers: List<String>, name: String): String? {
+        for (header in headers) {
+            if (header.startsWith("$name=")) {
+                return header.split(";")[0].split("=")[1]
+            }
+        }
+        return null
     }
 }

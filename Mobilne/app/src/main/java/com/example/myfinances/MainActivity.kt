@@ -3,6 +3,7 @@ package com.example.myfinances
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import okhttp3.*
@@ -15,7 +16,9 @@ import org.json.JSONArray
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
-    private val client = OkHttpClient()
+    private val client = ApiClient.client
+
+    private var isOwner = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,41 +29,20 @@ class MainActivity : AppCompatActivity() {
         val welcomeText = findViewById<TextView>(R.id.welcomeText)
         welcomeText.text = "Welcome ${user}!"
 
+        checkOwnershipStatus()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
 
-        val request = Request.Builder()
-            .url("$BASE_URL/household/get")
-            .get()
-            .build()
-
-        ApiClient.client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string()?.let { body ->
-                    val households = JSONArray(body)
-                    val userIsOwner = (0 until households.length())
-                        .map { households.getJSONObject(it) }
-                        .any { it.optBoolean("is_owner", false) }
-
-                    runOnUiThread {
-                        if (menu != null && userIsOwner) {
-                            menu.findItem(R.id.inviteUser)?.isVisible = true
-                            menu.findItem(R.id.createHousehold)?.isVisible = false
-                        }
-                    }
-                }
-            }
-        })
+        if (isOwner) {
+            menu?.findItem(R.id.createHousehold)?.isVisible = false
+        }
 
         return true
     }
 
-    fun logout(item: android.view.MenuItem) {
+    fun logout(item: MenuItem) {
         val requestBody = "".toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
             .url("$BASE_URL/user/logout")
@@ -93,12 +75,48 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun checkOwnershipStatus() {
+        val request = Request.Builder()
+            .url("$BASE_URL/household/get")
+            .get()
+            .build()
+
+        ApiClient.client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string() ?: return
+
+                runOnUiThread {
+                    try {
+                        val households = JSONArray(responseBody)
+                        isOwner = (0 until households.length())
+                            .map { households.getJSONObject(it) }
+                            .any { it.optBoolean("is_owner", false) }
+
+                    } catch (e: Exception) {
+                        isOwner = false
+                    }
+
+                    invalidateOptionsMenu()
+                }
+            }
+        })
+    }
+
     fun showHouseholds(item: android.view.MenuItem) {
         val intent = Intent(this, ShowHouseholdActivity::class.java)
         startActivity(intent)
     }
-    fun createHousehold(item: android.view.MenuItem) {
+
+    fun createHousehold(item: MenuItem) {
         val intent = Intent(this, CreateHouseholdActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun joinHousehold(item: MenuItem) {
+        val intent = Intent(this, JoinHouseholdActivity::class.java)
         startActivity(intent)
     }
 
