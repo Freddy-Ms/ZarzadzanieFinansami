@@ -1,4 +1,4 @@
-from Models import db, User, Household, ShoppingList, Product
+from Models import db, User, Household, ShoppingList, Product, PurchaseEvent
 from flask import Flask, request, jsonify, make_response, g
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -167,6 +167,71 @@ def edit_product_in_shopping_list():
     message, status_code = Product.edit(g.user_id, data)
     return jsonify(message), status_code
 
+@app.route('/purchaseevent/create', methods=['POST'])
+@token_required
+def create_purchase_event():
+    try:
+        data = request.get_json()
+        name = request.form.get('name')
+        household_id = request.form.get('household_id')
+        receipt_file = request.files.get('receipt')
+
+        file_content = receipt_file.read() if receipt_file else None
+
+        data = {
+            'name': name,
+            'household_id': int(household_id) if household_id else None,
+            'receipt': file_content
+        }
+
+        message, status_code = PurchaseEvent.create(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+@app.route('/purchaseevent/delete', methods=['POST'])
+@token_required
+def delete_purchase_events():
+    data = request.get_json()
+    message, status_code = PurchaseEvent.delete(g.user_id, data)
+    return jsonify(message), status_code
+
+
+@app.route('/OCR', methods=['POST'])
+@token_required
+def ocr_receipt():
+    try:
+        receipt_file = request.files.get('receipt')
+        if not receipt_file:
+            return jsonify({'message': 'No receipt file provided'}), 400
+
+        
+        # Simulating OCR result for demonstration purposes
+        ocr_result = {
+            'Milk': 1.50,
+            'Eggs': 3.20,
+            'Cheese': 4.50,
+            'Apples': 2.30,
+            'Bananas': 1.20,
+            'Chicken': 5.00,
+            'Rice': 1.80,
+            'Pasta': 1.60,
+            'Tomato Sauce': 2.50,
+            }
+        #ocr_result = SZYMON DO ROBOTY
+        products = []
+        for name, price in ocr_result.items():
+            products.append({
+                'name': name,
+                'quantity': 1,  
+                'price': price,
+                'subcategory_id': None,  
+                'unit_id': None  
+            })
+
+        return jsonify({'message': 'OCR processed successfully', 'products': products}), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 
 

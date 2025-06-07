@@ -9,3 +9,5 @@ class PurchasedProduct(db.Model):
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'))
     price = db.Column(db.Numeric(10, 2))
     event_id = db.Column(db.Integer, db.ForeignKey('purchase_event.id', ondelete='CASCADE'))
+
+    event = db.relationship('PurchaseEvent', back_populates='products')
