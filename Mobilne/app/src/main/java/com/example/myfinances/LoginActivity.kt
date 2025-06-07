@@ -13,30 +13,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
 
-const val BASE_URL = "http:192.168.100.6:5000"
+const val BASE_URL = "http://192.168.100.6:5000"
 
 var user = ""
 
 class LoginActivity : AppCompatActivity() {
 
-    // CookieJar to przechowywania cookies w pamięci
-    class SimpleCookieJar : CookieJar {
-        private val cookieStore: MutableMap<String, List<Cookie>> = HashMap()
-
-        override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-            cookieStore[url.host] = cookies
-        }
-
-        override fun loadForRequest(url: HttpUrl): List<Cookie> {
-            return cookieStore[url.host] ?: emptyList()
-        }
-    }
-
-    private val cookieJar = SimpleCookieJar()
-
-    private val client = OkHttpClient.Builder()
-        .cookieJar(cookieJar)
-        .build()
+    private val client = ApiClient.client
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

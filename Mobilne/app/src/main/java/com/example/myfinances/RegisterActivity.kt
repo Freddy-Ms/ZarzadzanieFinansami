@@ -14,7 +14,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var registerButton: Button
-    private val client = OkHttpClient()
+    private val client = ApiClient.client
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

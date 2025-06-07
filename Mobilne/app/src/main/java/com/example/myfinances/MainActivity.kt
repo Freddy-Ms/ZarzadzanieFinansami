@@ -11,23 +11,52 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import okhttp3.Request
+import org.json.JSONArray
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     private val client = OkHttpClient()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
         val welcomeText = findViewById<TextView>(R.id.welcomeText)
         welcomeText.text = "Welcome ${user}!"
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+
+        val request = Request.Builder()
+            .url("$BASE_URL/household/get")
+            .get()
+            .build()
+
+        ApiClient.client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.body?.string()?.let { body ->
+                    val households = JSONArray(body)
+                    val userIsOwner = (0 until households.length())
+                        .map { households.getJSONObject(it) }
+                        .any { it.optBoolean("is_owner", false) }
+
+                    runOnUiThread {
+                        if (menu != null && userIsOwner) {
+                            menu.findItem(R.id.inviteUser)?.isVisible = true
+                            menu.findItem(R.id.createHousehold)?.isVisible = false
+                        }
+                    }
+                }
+            }
+        })
+
         return true
     }
 
@@ -64,4 +93,15 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+    fun showHouseholds(item: android.view.MenuItem) {
+        val intent = Intent(this, ShowHouseholdActivity::class.java)
+        startActivity(intent)
+    }
+    fun createHousehold(item: android.view.MenuItem) {
+        val intent = Intent(this, CreateHouseholdActivity::class.java)
+        startActivity(intent)
+    }
+
 }
+
+
