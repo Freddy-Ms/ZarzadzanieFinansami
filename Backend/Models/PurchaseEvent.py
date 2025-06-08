@@ -30,6 +30,16 @@ class PurchaseEvent(db.Model):
         ),
     )
 
+    def to_dict(self):
+        """Convert the purchase event object to a dictionary."""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'household_id': self.household_id,
+            'date': self.date.isoformat(),
+            'name': self.name,
+            'products': [product.to_dict() for product in self.products]
+        }
     @staticmethod
     def create(user_id, data):
         """Create a new purchase event with the provided data.
@@ -96,4 +106,55 @@ class PurchaseEvent(db.Model):
 
         except Exception as e:
             db.session.rollback()
+            return {'message': str(e)}, 500
+        
+    @staticmethod
+    def get(user_id, data):
+        """Retrieve purchase events for a user or household.
+        The data should include 'household_id' if fetching household events."""
+        try:
+            household_id = data.get('household_id')
+            if household_id:
+                events = PurchaseEvent.query.filter_by(household_id=household_id).all()
+            else:
+                events = PurchaseEvent.query.filter_by(user_id=user_id).all()
+
+            result = []
+            for event in events:
+                event_dict = event.to_dict()
+                result.append(event_dict)
+
+            return {'events': result}, 200
+
+        except Exception as e:
+            return {'message': str(e)}, 500
+        
+    @staticmethod
+    def receipt_get(user_id, data):
+        """Retrieve the receipt image for a purchase event.
+        The data should include 'event_id'."""
+        try:
+            event_id = data.get('event_id')
+            if not event_id:
+                return {'message': 'Event ID is required'}, 400
+
+            event = PurchaseEvent.query.filter_by(id=event_id).first()
+            if not event or not event.receipt:
+                return {'message': 'Receipt not found'}, 404
+
+            if event.user_id:
+                if event.user_id != user_id:
+                    return {'message': 'Access denied'}, 403
+            elif event.household_id:
+                household = Household.query.filter_by(id=event.household_id).first()
+                if not household:
+                    return {'message': 'Household not found'}, 404
+
+                is_member = any(member.user_id == user_id for member in household.members)
+                if not is_member:
+                    return {'message': 'Access denied'}, 403
+
+            return {'message': 'Image sent!','receipt': event.receipt, 'event_id': event.id}, 200
+
+        except Exception as e:
             return {'message': str(e)}, 500

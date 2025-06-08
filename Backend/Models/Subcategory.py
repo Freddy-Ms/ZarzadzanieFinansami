@@ -8,6 +8,8 @@ class Subcategory(db.Model):
 
     products = db.relationship('Product', back_populates='subcategory')
     category = db.relationship('Category', back_populates='subcategories')
+    purchased_products = db.relationship('PurchasedProduct', back_populates='subcategory')
+
 
     def to_dict(self):
         """Convert the subcategory object to a dictionary."""

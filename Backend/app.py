@@ -1,10 +1,12 @@
 from Models import db, User, Household, ShoppingList, Product, PurchaseEvent, Subcategory, QuantityUnit
-from flask import Flask, request, jsonify, make_response, g
+from flask import Flask, request, jsonify, make_response, g, send_file
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 from Authentication import token_required, set_tokens_in_cookies
 import json
+from io import BytesIO
+
 
 app = Flask(__name__)
 CORS(app, supports_credentials = True)
@@ -202,6 +204,32 @@ def delete_purchase_events():
     message, status_code = PurchaseEvent.delete(g.user_id, data)
     return jsonify(message), status_code
 
+@app.route('/purchaseevent/get', methods=['POST'])
+@token_required
+def get_purchase_events():
+    try:
+        data = request.get_json()
+        message, status_code = PurchaseEvent.get(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+    
+@app.route('/purchaseevent/receipt/get', methods=['POST'])
+@token_required
+def get_receipt():
+    try:
+        data = request.get_json()
+        message, status_code = PurchaseEvent.receipt_get(g.user_id, data)
+        if status_code == 200:
+            return send_file(
+                BytesIO(message['receipt']),
+                mimetype='image/jpeg',
+                as_attachment=False,
+                download_name=f"receipt_{message['event_id']}.jpg"
+            )
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/subcategory/get', methods=['GET'])
 @token_required
