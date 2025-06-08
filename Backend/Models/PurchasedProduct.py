@@ -7,7 +7,7 @@ class PurchasedProduct(db.Model):
     quantity = db.Column(db.Integer, nullable=True)
     unit_id = db.Column(db.Integer, db.ForeignKey('quantity_unit.id'), nullable=True)
     subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
-    price = db.Column(db.Numeric(10, 2))
+    price = db.Column(db.Numeric(10, 2), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('purchase_event.id', ondelete='CASCADE'))
 
     event = db.relationship('PurchaseEvent', back_populates='products')
