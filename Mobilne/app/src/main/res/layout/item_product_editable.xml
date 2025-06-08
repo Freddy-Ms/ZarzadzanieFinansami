@@ -11,39 +11,46 @@
         android:id="@+id/productNameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Product name" />
+        android:hint="Product name"
+        android:textColor="@color/black"/>
 
     <EditText
         android:id="@+id/quantityEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Quantity"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        android:textColor="@color/black"/>
 
     <EditText
         android:id="@+id/priceEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Price"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        android:textColor="@color/black"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Unit:" />
+        android:text="Unit:"
+        android:textColor="@color/black"/>
 
     <Spinner
         android:id="@+id/unitSpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Subcategory:" />
+        android:text="Subcategory:"
+        android:textColor="@color/black"/>
 
     <Spinner
         android:id="@+id/subcategorySpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"/>
 </LinearLayout>

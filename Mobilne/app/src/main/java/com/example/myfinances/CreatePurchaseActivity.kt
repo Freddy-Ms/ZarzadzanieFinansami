@@ -51,9 +51,18 @@ class CreatePurchaseActivity : AppCompatActivity() {
         photoFile = File(photoPath)
 
         showReceiptPhoto(photoFile)
-        loadUnits()
-        loadSubcategories()
-        loadHouseholds()
+        val dataLoader = LoadData(
+            context = this,
+            unitList = unitsList,
+            subcategoryList = subcategoryList,
+            householdList = householdList,
+            householdSpinner = householdSpinner,
+            onComplete = { renderProductFields(productArray) }
+        )
+        dataLoader.loadUnits()
+        dataLoader.loadSubcategories()
+        dataLoader.loadHouseholds()
+
         renderProductFields(productArray)
 
         saveButton.setOnClickListener {
@@ -89,109 +98,18 @@ class CreatePurchaseActivity : AppCompatActivity() {
 
             unitSpinner.adapter = ArrayAdapter(
                 this,
-                android.R.layout.simple_spinner_item,
+                R.layout.spinner_item,
                 unitsList.map { it.second })
             subcategorySpinner.adapter = ArrayAdapter(
                 this,
-                android.R.layout.simple_spinner_item,
+                R.layout.spinner_item,
                 subcategoryList.map { it.second })
 
             productListLayout.addView(itemView)
         }
     }
 
-    private fun loadUnits() {
-        val request = Request.Builder().url("$BASE_URL/quantityunit/get").get().build()
-        ApiClient.client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(
-                        this@CreatePurchaseActivity,
-                        "Failed to load units",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
 
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string()?.let { body ->
-                    val jsonArray = JSONArray(body)
-                    unitsList.clear()
-                    for (i in 0 until jsonArray.length()) {
-                        val obj = jsonArray.getJSONObject(i)
-                        unitsList.add(obj.getInt("id") to obj.getString("name"))
-                    }
-                    runOnUiThread { renderProductFields(productArray) }
-                }
-            }
-        })
-    }
-
-    private fun loadSubcategories() {
-        val request = Request.Builder().url("$BASE_URL/subcategory/get").get().build()
-        ApiClient.client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(
-                        this@CreatePurchaseActivity,
-                        "Failed to load subcategories",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string()?.let { body ->
-                    val jsonArray = JSONArray(body)
-                    subcategoryList.clear()
-                    for (i in 0 until jsonArray.length()) {
-                        val obj = jsonArray.getJSONObject(i)
-                        subcategoryList.add(obj.getInt("id") to obj.getString("name"))
-                    }
-                    runOnUiThread { renderProductFields(productArray) }
-                }
-            }
-        })
-    }
-
-    private fun loadHouseholds() {
-        val request = Request.Builder().url("$BASE_URL/household/get").get().build()
-        ApiClient.client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(
-                        this@CreatePurchaseActivity,
-                        "Failed to load households",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string()?.let { body ->
-                    val jsonArray = JSONArray(body)
-                    householdList.clear()
-                    householdList.add(-1 to "None")
-
-                    for (i in 0 until jsonArray.length()) {
-                        val obj = jsonArray.getJSONObject(i)
-                        householdList.add(obj.getInt("id") to obj.getString("name"))
-                    }
-
-                    val adapter = ArrayAdapter(
-                        this@CreatePurchaseActivity,
-                        android.R.layout.simple_spinner_item,
-                        householdList.map { it.second }
-                    )
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-                    runOnUiThread {
-                        householdSpinner.adapter = adapter
-                    }
-                }
-            }
-        })
-    }
 
 
     private fun savePurchase() {
