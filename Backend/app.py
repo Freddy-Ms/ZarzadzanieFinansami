@@ -4,6 +4,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 from Authentication import token_required, set_tokens_in_cookies
+import json
 
 app = Flask(__name__)
 CORS(app, supports_credentials = True)
@@ -171,17 +172,22 @@ def edit_product_in_shopping_list():
 @token_required
 def create_purchase_event():
     try:
-        data = request.get_json()
         name = request.form.get('name')
         household_id = request.form.get('household_id')
         receipt_file = request.files.get('receipt')
+        products_raw = request.form.get('products')
 
         file_content = receipt_file.read() if receipt_file else None
-
+        
+        try:
+            products = json.loads(products_raw) if products_raw else []
+        except json.JSONDecodeError:
+            return jsonify({'message': 'Invalid JSON in products field'}), 400
         data = {
             'name': name,
             'household_id': int(household_id) if household_id else None,
-            'receipt': file_content
+            'receipt': file_content,
+            'products': products
         }
 
         message, status_code = PurchaseEvent.create(g.user_id, data)

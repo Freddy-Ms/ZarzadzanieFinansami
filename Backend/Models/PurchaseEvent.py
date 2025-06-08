@@ -13,7 +13,7 @@ class PurchaseEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     household_id = db.Column(db.Integer, db.ForeignKey('household.id', ondelete='CASCADE'), nullable=True)
-    date = db.Column(db.DateTime, server_default=text("date_trunc('minute', now())"))
+    date = db.Column(db.Date, server_default=text("CURRENT_DATE"))
     receipt = db.Column(db.LargeBinary, nullable=True)
     name = db.Column(db.String(255), nullable=True)
 
@@ -52,6 +52,9 @@ class PurchaseEvent(db.Model):
 
                 event = PurchaseEvent(name=name, household_id=household_id)
             else:
+                if not user_id:
+                    return {'message': 'User ID is required if household ID is not provided'}, 400
+                
                 event = PurchaseEvent(name=name, user_id=user_id)
 
             db.session.add(event)

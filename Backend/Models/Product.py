@@ -5,10 +5,10 @@ class Product(db.Model):
     __tablename__ = 'product'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=True)
+    name = db.Column(db.String(255), nullable=False)
     quantity = db.Column(db.Integer, nullable=True)
-    unit_id = db.Column(db.Integer, db.ForeignKey('quantity_unit.id'))
-    subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'))
+    unit_id = db.Column(db.Integer, db.ForeignKey('quantity_unit.id'), nullable=True)
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=True)
     list_id = db.Column(db.Integer, db.ForeignKey('shopping_list.id', ondelete='CASCADE'))
 
     shopping_list = db.Relationship('ShoppingList', back_populates = 'products', foreign_keys=[list_id])
