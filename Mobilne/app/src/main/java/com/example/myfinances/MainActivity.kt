@@ -124,6 +124,11 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    fun createShoppingList(item: MenuItem){
+        val intent = Intent(this, CreateShoppingListActivity::class.java)
+        startActivity(intent)
+    }
+
 }
 
 

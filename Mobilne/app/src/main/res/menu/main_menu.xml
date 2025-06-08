@@ -18,7 +18,8 @@
         <menu>
             <item
                 android:id="@+id/createShoppingList"
-                android:title="Create shopping list" />
+                android:title="Create shopping list"
+                android:onClick="createShoppingList"/>
             <item
                 android:id="@+id/showShoppingLists"
                 android:title="Show your shopping lists" />

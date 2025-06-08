@@ -63,7 +63,7 @@ class ShoppingList(db.Model):
                 
             db.session.add(shopping_list)
             db.session.commit()
-            return {'message': 'Shopping list created successfully'}, 201
+            return {'id': shopping_list.id, 'message': 'Shopping list created successfully'}, 201
         except Exception as e:
             db.session.rollback()
             return {'error': str(e)}, 500

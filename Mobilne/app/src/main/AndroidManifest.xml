@@ -53,6 +53,7 @@
         <activity android:name=".JoinHouseholdActivity" />\
         <activity android:name=".AddReceiptActivity" />
         <activity android:name=".CreatePurchaseActivity" />
+        <activity android:name=".CreateShoppingListActivity"/>
     </application>
 
 </manifest>
