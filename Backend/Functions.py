@@ -1,5 +1,6 @@
 from Models import db
 from Models.HouseholdUser import HouseholdUser
+
 def handle_household_ownership_on_delete_or_leave(user_id):
     """Handle the transfer of household ownership or deletion of households when a user is deleted."""
     from Models.Household import Household

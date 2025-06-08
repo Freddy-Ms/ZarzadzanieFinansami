@@ -67,7 +67,7 @@ class EditHouseholdActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?) = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                showFilteredMembers(newText?: "")
+                showFilteredMembers(newText ?: "")
                 return true
             }
         })
@@ -180,7 +180,11 @@ class EditHouseholdActivity : AppCompatActivity() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
-                    Toast.makeText(this@EditHouseholdActivity, "Failed to load members", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@EditHouseholdActivity,
+                        "Failed to load members",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -200,12 +204,17 @@ class EditHouseholdActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-                        Toast.makeText(this@EditHouseholdActivity, "Could not fetch members", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@EditHouseholdActivity,
+                            "Could not fetch members",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
         })
     }
+
     private fun displayMembers(members: JSONArray) {
         allMembers.clear()
         for (i in 0 until members.length()) {
@@ -244,17 +253,26 @@ class EditHouseholdActivity : AppCompatActivity() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
-                    Toast.makeText(this@EditHouseholdActivity, "Kick failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@EditHouseholdActivity, "Kick failed", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 runOnUiThread {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@EditHouseholdActivity, "User kicked", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@EditHouseholdActivity,
+                            "User kicked",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         loadMembers() // reload after kick
                     } else {
-                        Toast.makeText(this@EditHouseholdActivity, "Error: ${response.code}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@EditHouseholdActivity,
+                            "Error: ${response.code}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -273,7 +291,8 @@ class EditHouseholdActivity : AppCompatActivity() {
 
             val nameText = TextView(this).apply {
                 text = username
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                layoutParams =
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 textSize = 18f
             }
 
