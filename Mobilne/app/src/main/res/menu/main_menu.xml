@@ -3,12 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/receipts"
-        android:title="Receipts">
+        android:title="Purchase">
         <menu>
             <item
                 android:id="@+id/addReceipts"
-                android:title="Add new receipt"
+                android:title="Add new purchase"
                 android:onClick="addReceipt" />
+            <item
+                android:id="@+id/showPurhcases"
+                android:title="Show all purchases" />
         </menu>
     </item>
     <item android:title="Shopping Lists">

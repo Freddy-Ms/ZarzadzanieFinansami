@@ -52,6 +52,7 @@
         <activity android:name="EditHouseholdActivity" />
         <activity android:name=".JoinHouseholdActivity" />\
         <activity android:name=".AddReceiptActivity" />
+        <activity android:name=".CreatePurchaseActivity" />
     </application>
 
 </manifest>

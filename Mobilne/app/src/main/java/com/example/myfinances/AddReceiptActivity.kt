@@ -1,6 +1,5 @@
 package com.example.myfinances
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -152,12 +151,12 @@ class AddReceiptActivity : AppCompatActivity() {
                             "${item.getString("name")}: ${item.getDouble("price")}"
                         }
 
-                        AlertDialog.Builder(this@AddReceiptActivity)
-                            .setTitle("Products from OCR")
-                            .setMessage(names)
-                            .setPositiveButton("OK", null)
-                            .show()
-                        //TODO: create purchase event, add category and quantity to list of products
+                        val intent =
+                            Intent(this@AddReceiptActivity, CreatePurchaseActivity::class.java)
+                        intent.putExtra("ocrProducts", products.toString())
+                        intent.putExtra("photoPath", file.absolutePath)
+                        startActivity(intent)
+                        finish()
                     } else {
                         Toast.makeText(
                             this@AddReceiptActivity,

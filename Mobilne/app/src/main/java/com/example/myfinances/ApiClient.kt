@@ -13,7 +13,6 @@ object ApiClient {
         override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
             cookieStore[url.host] = cookies
 
-            // zapisz do SharedPreferences
             val prefs = context.getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
             val editor = prefs.edit()
             for (cookie in cookies) {
