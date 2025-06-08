@@ -13,7 +13,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
 
-const val BASE_URL = "http://192.168.100.6:5000"
+const val BASE_URL = "http://192.168.100.6:5000" //Change for your address of local app
 
 var user = ""
 

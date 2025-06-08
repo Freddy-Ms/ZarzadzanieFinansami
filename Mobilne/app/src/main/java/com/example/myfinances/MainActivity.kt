@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     if (response.isSuccessful) {
                         Toast.makeText(this@MainActivity, "Logged out", Toast.LENGTH_SHORT).show()
-
                         val intent = Intent(this@MainActivity, LoginActivity::class.java)
                         startActivity(intent)
                     } else {
@@ -117,6 +116,11 @@ class MainActivity : AppCompatActivity() {
 
     fun joinHousehold(item: MenuItem) {
         val intent = Intent(this, JoinHouseholdActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun addReceipt(item: MenuItem) {
+        val intent = Intent(this, AddReceiptActivity::class.java)
         startActivity(intent)
     }
 

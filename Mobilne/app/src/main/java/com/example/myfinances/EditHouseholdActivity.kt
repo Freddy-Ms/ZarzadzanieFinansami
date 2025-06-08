@@ -266,7 +266,7 @@ class EditHouseholdActivity : AppCompatActivity() {
                             "User kicked",
                             Toast.LENGTH_SHORT
                         ).show()
-                        loadMembers() // reload after kick
+                        loadMembers()
                     } else {
                         Toast.makeText(
                             this@EditHouseholdActivity,
