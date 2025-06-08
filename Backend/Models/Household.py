@@ -32,7 +32,7 @@ class Household(db.Model):
             'name': self.name,
             'owner_username': self.owner.username,
             'is_owner': self.ownership == current_user_id,
-            'members': [member.user.username for member in self.members if member.user_id != self.ownership], 
+            'members': [member.user.username for member in self.members if member.user_id != self.ownership],
         }
     
     @staticmethod
