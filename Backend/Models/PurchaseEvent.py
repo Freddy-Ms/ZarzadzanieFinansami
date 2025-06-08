@@ -72,17 +72,11 @@ class PurchaseEvent(db.Model):
             db.session.flush()  
 
             for p in products:
-                product = PurchasedProduct(
-                    name=p.get('name'),
-                    quantity=p.get('quantity'),
-                    price=p.get('price'),
-                    subcategory_id=p.get('subcategory_id'),
-                    unit_id=p.get('unit_id'),
-                    event_id=event.id
-                )
-                db.session.add(product)
+                p['event_id'] = event.id  
+                PurchasedProduct.add(p, commit=False)  
 
-            db.session.commit()
+            db.session.commit()  
+
             return {'message': 'Purchase event and products saved'}, 201
 
         except Exception as e:
@@ -95,7 +89,7 @@ class PurchaseEvent(db.Model):
         The data should include 'event_id'."""
         try:
             event_id = data.get('event_id')
-            event = PurchaseEvent.query.filter_by(id=event_id, user_id=user_id).first()
+            event = PurchaseEvent.query.filter_by(id=event_id).first()
 
             if not event:
                 return {'message': 'Purchase event not found or you do not have permission to delete it'}, 404
@@ -157,4 +151,35 @@ class PurchaseEvent(db.Model):
             return {'message': 'Image sent!','receipt': event.receipt, 'event_id': event.id}, 200
 
         except Exception as e:
+            return {'message': str(e)}, 500
+        
+
+    @staticmethod
+    def edit(user_id, data):
+        """Edit a purchase event's name and date.
+        Required: 'event_id'.
+        Optional: 'name' and 'date' (format: YYYY-MM-DD)."""
+        try:
+            event_id = data.get('event_id')
+            if not event_id:
+                return {'message': 'Missing event_id'}, 400
+
+            event = PurchaseEvent.query.filter_by(id=event_id).first()
+            if not event:
+                return {'message': 'Purchase event not found'}, 404
+
+            if 'name' in data:
+                event.name = data['name']
+
+            if 'date' in data:
+                try:
+                    event.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+                except ValueError:
+                    return {'message': 'Invalid date format. Use YYYY-MM-DD.'}, 400
+
+            db.session.commit()
+            return {'message': 'Purchase event updated successfully'}, 200
+
+        except Exception as e:
+            db.session.rollback()
             return {'message': str(e)}, 500

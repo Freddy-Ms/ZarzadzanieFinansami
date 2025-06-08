@@ -1,4 +1,4 @@
-from Models import db, User, Household, ShoppingList, Product, PurchaseEvent, Subcategory, QuantityUnit
+from Models import db, User, Household, ShoppingList, Product, PurchaseEvent, Subcategory, QuantityUnit, PurchasedProduct
 from flask import Flask, request, jsonify, make_response, g, send_file
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -23,152 +23,212 @@ def homepage():
 
 @app.route('/user/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    message, status_code = User.register(data)
-    return jsonify(message), status_code
-
+    try:
+        data = request.get_json()
+        message, status_code = User.register(data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+    
 @app.route('/user/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    response_data, status_code = User.login(data)
+    try:
+        data = request.get_json()
+        response_data, status_code = User.login(data)
     
-    if "access_token" in response_data and "refresh_token" in response_data:
-        access_token = response_data.pop("access_token")
-        refresh_token = response_data.pop("refresh_token")
+        if "access_token" in response_data and "refresh_token" in response_data:
+            access_token = response_data.pop("access_token")
+            refresh_token = response_data.pop("refresh_token")
         
-        response = make_response(jsonify(response_data), status_code)
-        set_tokens_in_cookies(response, access_token, refresh_token)
-        return response
+            response = make_response(jsonify(response_data), status_code)
+            set_tokens_in_cookies(response, access_token, refresh_token)
+            return response
     
-    return jsonify(response_data), status_code
+        return jsonify(response_data), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
     
 
 @app.route('/user/logout', methods=['POST'])
 def logout():
-    response = make_response(jsonify({"message": "Logged out successfully"}), 200)
-    response.delete_cookie('access_token', secure=True, samesite='None')
-    response.delete_cookie('refresh_token', secure=True, samesite='None')
-    return response
+    try:
+        response = make_response(jsonify({"message": "Logged out successfully"}), 200)
+        response.delete_cookie('access_token', secure=True, samesite='None')
+        response.delete_cookie('refresh_token', secure=True, samesite='None')
+        return response
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/user/delete', methods=['POST'])
 @token_required
 def delete_user():
-    message, status_code = User.delete(g.user_id)
-    if status_code == 200:
-        response = make_response(jsonify(message), status_code)
-        response.delete_cookie('access_token', secure=True, samesite='None')
-        response.delete_cookie('refresh_token', secure=True, samesite='None')
-        return response
-    return jsonify(message), status_code
+    try:
+        message, status_code = User.delete(g.user_id)
+        if status_code == 200:
+            response = make_response(jsonify(message), status_code)
+            response.delete_cookie('access_token', secure=True, samesite='None')
+            response.delete_cookie('refresh_token', secure=True, samesite='None')
+            return response
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/user/edit', methods=['POST'])
 @token_required
 def edit_user():
-    data = request.get_json()
-    message, status_code = User.edit(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = User.edit(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/user/get', methods=['GET'])
 @token_required
 def get_user():
-    message, status_code = User.get_user(g.user_id)
-    return jsonify(message), status_code
+    try:
+        message, status_code = User.get_user(g.user_id)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/create', methods=['POST'])
 @token_required
 def create_household():
-    data = request.get_json()
-    message, status_code = Household.create(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Household.create(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/edit', methods=['POST'])
 @token_required
 def edit_household():
-    data = request.get_json()
-    message, status_code = Household.edit(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Household.edit(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/delete', methods=['POST'])
 @token_required
 def delete_household():
-    data = request.get_json()
-    message, status_code = Household.delete(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Household.delete(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/create_invite_token', methods=['POST'])
 @token_required
 def invite_user_to_household():
-    data = request.get_json()
-    message, status_code = Household.invite_user(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Household.invite_user(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/accept_invite', methods=['POST'])
 @token_required
 def accept_invite():
-    data = request.get_json()
-    message, status_code = Household.accept_invite(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Household.accept_invite(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/get', methods=['GET'])
 @token_required
 def get_households():
-    message, status_code = Household.get_user_households(g.user_id)
-    return jsonify(message), status_code
+    try:
+        message, status_code = Household.get_user_households(g.user_id)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/leave', methods=['DELETE'])
 @token_required
 def leave_household():
-    data = request.get_json()
-    message, status_code = Household.leave_household(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Household.leave_household(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/household/kick', methods=['POST'])
 @token_required
 def kick_user_from_household():
-    data = request.get_json()
-    message, status_code = Household.kick_user(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Household.kick_user(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/shoppinglist/create', methods = ['POST'])
 @token_required
 def create_shopping_list():
-    data = request.get_json()
-    message, status_code = ShoppingList.create(g.user_id, data)
-    return jsonify(message), status_code
-
+    try:
+        data = request.get_json()
+        message, status_code = ShoppingList.create(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+    
 @app.route('/shoppinglist/delete', methods = ['POST'])
 @token_required
 def delete_shopping_list():
-    data = request.get_json()
-    message, status_code = ShoppingList.delete(g.user_id, data)
-    return jsonify(message), status_code
-
+    try:
+        data = request.get_json()
+        message, status_code = ShoppingList.delete(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+    
 @app.route('/shoppinglist/get', methods = ['GET'])
 @token_required
 def get_shopping_lists():
-    message, status_code = ShoppingList.get_user_shopping_lists(g.user_id)
-    return jsonify(message), status_code
+    try:
+        message, status_code = ShoppingList.get_user_shopping_lists(g.user_id)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/shoppinglist/product/add', methods = ['POST'])
 @token_required
 def add_product_to_shopping_list():
-    data = request.get_json()
-    message, status_code = Product.add(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Product.add(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/shoppinglist/product/remove', methods = ['POST'])
 @token_required
 def remove_product_from_shopping_list():
-    data = request.get_json()
-    message, status_code = Product.remove(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Product.remove(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/shoppinglist/product/edit', methods = ['POST'])
 @token_required
 def edit_product_in_shopping_list():
-    data = request.get_json()
-    message, status_code = Product.edit(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = Product.edit(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/purchaseevent/create', methods=['POST'])
 @token_required
@@ -197,12 +257,25 @@ def create_purchase_event():
     except Exception as e:
         return jsonify({'message': str(e)}), 500
 
+@app.route('/purchaseevent/edit', methods=['POST'])
+@token_required
+def edit_purchase_event():
+    try:
+        data = request.get_json()
+        message, status_code = PurchaseEvent.edit(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
 @app.route('/purchaseevent/delete', methods=['POST'])
 @token_required
 def delete_purchase_events():
-    data = request.get_json()
-    message, status_code = PurchaseEvent.delete(g.user_id, data)
-    return jsonify(message), status_code
+    try:
+        data = request.get_json()
+        message, status_code = PurchaseEvent.delete(g.user_id, data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/purchaseevent/get', methods=['POST'])
 @token_required
@@ -230,7 +303,37 @@ def get_receipt():
         return jsonify(message), status_code
     except Exception as e:
         return jsonify({'message': str(e)}), 500
+    
+@app.route('/purchaseevent/product/add', methods=['POST'])
+@token_required
+def add_product_to_purchase_event():
+    try:
+        data = request.get_json()
+        message, status_code = PurchasedProduct.add(data, commit=True)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
+@app.route('/purchaseevent/product/remove', methods=['POST'])
+@token_required
+def remove_product_from_purchase_event():
+    try:
+        data = request.get_json()
+        message, status_code = PurchasedProduct.remove(data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+    
+@app.route('/purchaseevent/product/edit', methods=['POST'])
+@token_required
+def edit_product_in_purchase_event():
+    try:
+        data = request.get_json()
+        message, status_code = PurchasedProduct.edit(data)
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+    
 @app.route('/subcategory/get', methods=['GET'])
 @token_required
 def get_subcategories():

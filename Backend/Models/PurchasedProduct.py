@@ -26,3 +26,78 @@ class PurchasedProduct(db.Model):
             'price': str(self.price),  
             'event_id': self.event_id
         }
+    
+    @staticmethod
+    def add(data, commit=True):
+        try:
+            name = data.get('name')
+            price = data.get('price')
+            event_id = data.get('event_id')
+
+            if not name or price is None or event_id is None:
+                return {'message': 'Missing required fields: name, price, event_id'}, 400
+
+            product = PurchasedProduct(
+                name=name,
+                price=price,
+                quantity=data.get('quantity'),
+                unit_id=data.get('unit_id'),
+                subcategory_id=data.get('subcategory_id'),
+                event_id=event_id
+            )
+
+            db.session.add(product)
+            if commit:
+                db.session.commit()
+
+            return {'message': 'Product added successfully', 'product_id': product.id}, 201
+
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 500
+        
+
+    @staticmethod
+    def remove(data):
+        """Remove a purchased product by its ID."""
+        try:
+            product_id = data.get('id')
+            product = PurchasedProduct.query.filter_by(id=product_id).first()
+            if not product:
+                return {'message': 'Product not found'}, 404
+
+            db.session.delete(product)
+            
+            db.session.commit()
+
+            return {'message': 'Product removed successfully'}, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 500
+        
+    @staticmethod
+    def edit(data):
+        """Edit a purchased product."""
+        try:
+            product_id = data.get('id')
+            if not product_id:
+                return {'message': 'Product ID is required'}, 400
+
+            product = PurchasedProduct.query.filter_by(id=product_id).first()
+            if not product:
+                return {'message': 'Product not found'}, 404
+
+            product.name = data.get('name', product.name)
+            product.quantity = data.get('quantity', product.quantity)
+            product.unit_id = data.get('unit_id', product.unit_id)
+            product.subcategory_id = data.get('subcategory_id', product.subcategory_id)
+            product.price = data.get('price', product.price)
+
+            db.session.commit()
+
+            return {'message': 'Product updated successfully'}, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 500
