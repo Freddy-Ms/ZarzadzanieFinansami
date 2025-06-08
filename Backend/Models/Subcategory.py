@@ -16,3 +16,9 @@ class Subcategory(db.Model):
             'name': self.name,
             'category_id': self.category_id
         }
+
+    @staticmethod
+    def get():
+        """Retrieve all subcategories."""
+        subcategories = Subcategory.query.all()
+        return [subcategory.to_dict() for subcategory in subcategories], 200
