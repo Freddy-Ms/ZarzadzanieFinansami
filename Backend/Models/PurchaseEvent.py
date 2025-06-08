@@ -40,6 +40,7 @@ class PurchaseEvent(db.Model):
             household_id = data.get('household_id')
             name = data.get('name')
             products = data.get('products', [])
+            receipt = data.get('receipt')
 
             if household_id:
                 household = Household.query.filter_by(id=household_id).first()
@@ -50,12 +51,12 @@ class PurchaseEvent(db.Model):
                 if not is_member:
                     return {'message': 'User is not a member of the household'}, 403
 
-                event = PurchaseEvent(name=name, household_id=household_id)
+                event = PurchaseEvent(name=name, household_id=household_id, receipt=receipt)
             else:
                 if not user_id:
                     return {'message': 'User ID is required if household ID is not provided'}, 400
                 
-                event = PurchaseEvent(name=name, user_id=user_id)
+                event = PurchaseEvent(name=name, user_id=user_id, receipt=receipt)
 
             db.session.add(event)
             db.session.flush()  
