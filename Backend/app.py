@@ -1,4 +1,4 @@
-from Models import db, User, Household, ShoppingList, Product, PurchaseEvent
+from Models import db, User, Household, ShoppingList, Product, PurchaseEvent, Subcategory, QuantityUnit
 from flask import Flask, request, jsonify, make_response, g
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -202,6 +202,25 @@ def delete_purchase_events():
     message, status_code = PurchaseEvent.delete(g.user_id, data)
     return jsonify(message), status_code
 
+
+@app.route('/subcategory/get', methods=['GET'])
+@token_required
+def get_subcategories():
+    try:
+        message, status_code = Subcategory.get()
+        return jsonify(message), status_code
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+@app.route('/quantityunit/get', methods=['GET'])
+@token_required
+def get_quantity_units():
+    try:
+        message, summary = QuantityUnit.get()
+        return jsonify(message), summary
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 @app.route('/OCR', methods=['POST'])
 @token_required

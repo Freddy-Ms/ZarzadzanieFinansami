@@ -16,4 +16,8 @@ class QuantityUnit(db.Model):
             'shortcut': self.shortcut
         }
     
-    
+    @staticmethod
+    def get():
+        """Retrieve all quantity units."""
+        quantity_units = QuantityUnit.query.all()
+        return [unit.to_dict() for unit in quantity_units], 200
