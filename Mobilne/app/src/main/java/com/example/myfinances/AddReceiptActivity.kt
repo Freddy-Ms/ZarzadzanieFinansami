@@ -146,13 +146,8 @@ class AddReceiptActivity : AppCompatActivity() {
                     if (response.isSuccessful && body != null) {
                         val json = JSONObject(body)
                         val products = json.getJSONArray("products")
-                        val names = (0 until products.length()).joinToString("\n") {
-                            val item = products.getJSONObject(it)
-                            "${item.getString("name")}: ${item.getDouble("price")}"
-                        }
 
-                        val intent =
-                            Intent(this@AddReceiptActivity, CreatePurchaseActivity::class.java)
+                        val intent = Intent(this@AddReceiptActivity, CreatePurchaseActivity::class.java)
                         intent.putExtra("ocrProducts", products.toString())
                         intent.putExtra("photoPath", file.absolutePath)
                         startActivity(intent)

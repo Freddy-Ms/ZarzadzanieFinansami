@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myfinances.ApiClient.client
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -13,7 +14,6 @@ import java.io.IOException
 
 class ShowShoppingListsActivity : AppCompatActivity() {
 
-    private val client = ApiClient.client
     private lateinit var listLayout: LinearLayout
     private lateinit var searchView: SearchView
 

@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myfinances.ApiClient.client
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -109,9 +110,6 @@ class CreatePurchaseActivity : AppCompatActivity() {
         }
     }
 
-
-
-
     private fun savePurchase() {
         val purchaseName = purchaseNameInput.text.toString().trim()
         val selected = householdList.getOrNull(householdSpinner.selectedItemPosition)
@@ -133,7 +131,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
                 .toDoubleOrNull() ?: 1.0
             val price =
                 itemView.findViewById<EditText>(R.id.priceEditText).text.toString().toDoubleOrNull()
-                    ?: 0.0
+                    ?: 0.00
             val unitId =
                 unitsList.getOrNull(itemView.findViewById<Spinner>(R.id.unitSpinner).selectedItemPosition)?.first
             val subcategoryId =
@@ -167,7 +165,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
             .post(builder.build())
             .build()
 
-        ApiClient.client.newCall(request).enqueue(object : Callback {
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
                     Toast.makeText(

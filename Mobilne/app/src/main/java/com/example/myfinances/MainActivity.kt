@@ -11,14 +11,14 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.example.myfinances.ApiClient.client
 import okhttp3.Request
 import org.json.JSONArray
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
-    private val client = ApiClient.client
-
     private var isOwner = false
+    val user = intent.getStringExtra("user")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

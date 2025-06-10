@@ -7,17 +7,14 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myfinances.ApiClient.client
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
 
-var user = ""
-
 class LoginActivity : AppCompatActivity() {
-
-    private val client = ApiClient.client
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +50,6 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 put("username", loginInput)
             }
-            user = loginInput
             put("password", password)
         }
 
@@ -85,6 +81,7 @@ class LoginActivity : AppCompatActivity() {
                         editor.apply()
                         Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        intent.putExtra("user", loginInput)
                         finish()
                     } else {
                         Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()

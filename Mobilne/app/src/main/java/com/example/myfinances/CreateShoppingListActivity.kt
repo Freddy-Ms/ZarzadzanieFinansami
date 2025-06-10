@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.*
+import com.example.myfinances.ApiClient.client
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -85,7 +86,7 @@ class CreateShoppingListActivity : AppCompatActivity() {
             .post(listBody.toString().toRequestBody("application/json".toMediaTypeOrNull()))
             .build()
 
-        ApiClient.client.newCall(createRequest).enqueue(object : Callback {
+        client.newCall(createRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
                     Toast.makeText(this@CreateShoppingListActivity, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()

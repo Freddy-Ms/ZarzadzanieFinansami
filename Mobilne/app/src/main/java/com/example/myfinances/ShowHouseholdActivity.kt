@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myfinances.ApiClient.client
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONArray
@@ -14,7 +15,6 @@ import java.io.IOException
 
 class ShowHouseholdActivity : AppCompatActivity() {
 
-    private val client = ApiClient.client
     private lateinit var listLayout: LinearLayout
     private lateinit var searchView: SearchView
     private val householdList = mutableListOf<Pair<Int, String>>()
