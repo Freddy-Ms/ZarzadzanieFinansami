@@ -22,7 +22,8 @@
                 android:onClick="createShoppingList"/>
             <item
                 android:id="@+id/showShoppingLists"
-                android:title="Show your shopping lists" />
+                android:title="Show your shopping lists"
+                android:onClick="showShoppingLists"/>
         </menu>
     </item>
     <item android:title="Household">

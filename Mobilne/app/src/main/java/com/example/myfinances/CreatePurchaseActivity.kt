@@ -87,7 +87,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
                 layoutInflater.inflate(R.layout.item_product_editable, productListLayout, false)
 
             val nameInput = itemView.findViewById<EditText>(R.id.productNameEditText)
-            val quantityInput = itemView.findViewById<EditText>(R.id.quantityEditText)
+            val quantityInput = itemView.findViewById<EditText>(R.id.productQuantityEditText)
             val priceInput = itemView.findViewById<EditText>(R.id.priceEditText)
             val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
             val subcategorySpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
@@ -129,7 +129,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
 
             val name =
                 itemView.findViewById<EditText>(R.id.productNameEditText).text.toString().trim()
-            val quantity = itemView.findViewById<EditText>(R.id.quantityEditText).text.toString()
+            val quantity = itemView.findViewById<EditText>(R.id.productQuantityEditText).text.toString()
                 .toDoubleOrNull() ?: 1.0
             val price =
                 itemView.findViewById<EditText>(R.id.priceEditText).text.toString().toDoubleOrNull()

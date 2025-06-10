@@ -5,6 +5,8 @@ import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
+const val BASE_URL = "http://192.168.100.6:5000" //Change for your address of local app
+
 object ApiClient {
 
     class PersistentCookieJar(val context: android.content.Context) : CookieJar {
