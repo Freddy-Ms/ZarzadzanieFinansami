@@ -16,9 +16,9 @@ import okhttp3.Request
 import org.json.JSONArray
 import java.io.IOException
 
+
 class MainActivity : AppCompatActivity() {
     private var isOwner = false
-    val user = intent.getStringExtra("user")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
             .get()
             .build()
 
-        ApiClient.client.newCall(request).enqueue(object : Callback {
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
 
             override fun onResponse(call: Call, response: Response) {
@@ -134,6 +134,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    fun showPurchases(item: MenuItem){
+        Toast.makeText(this, "not implemented yet", Toast.LENGTH_SHORT)
+    }
 }
 
 

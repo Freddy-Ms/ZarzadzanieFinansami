@@ -14,6 +14,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
 
+var user = ""
 class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +52,7 @@ class LoginActivity : AppCompatActivity() {
                 put("username", loginInput)
             }
             put("password", password)
+            user = loginInput
         }
 
         val requestBody = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
@@ -81,7 +83,6 @@ class LoginActivity : AppCompatActivity() {
                         editor.apply()
                         Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        intent.putExtra("user", loginInput)
                         finish()
                     } else {
                         Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()

@@ -1,6 +1,7 @@
 package com.example.myfinances
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -130,8 +131,9 @@ class ShowShoppingListsActivity : AppCompatActivity() {
             val editButton = Button(this).apply {
                 text = "Edit"
                 setOnClickListener {
-                    Toast.makeText(this@ShowShoppingListsActivity, "Edit not implemented", Toast.LENGTH_SHORT).show()
-                }
+                    val intent = Intent(this@ShowShoppingListsActivity, EditShoppingListActivity::class.java)
+                    intent.putExtra("list_id", list.getInt("id"))
+                    startActivity(intent)}
             }
 
             val deleteButton = Button(this).apply {

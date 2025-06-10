@@ -11,7 +11,8 @@
                 android:onClick="addReceipt" />
             <item
                 android:id="@+id/showPurhcases"
-                android:title="Show all purchases" />
+                android:title="Show all purchases"
+                android:onClick="showPurchases"/>
         </menu>
     </item>
     <item android:title="Shopping Lists">
