@@ -197,8 +197,7 @@ def get_shopping_lists():
     try:
         message, status_code = ShoppingList.get_user_shopping_lists(g.user_id)
         return jsonify(message), status_code
-    except Exception as e:
-        return jsonify({'message': str(e)}), 500
+    except Exception as e:        return jsonify({'message': str(e)}), 500
 
 @app.route('/shoppinglist/product/add', methods = ['POST'])
 @token_required
