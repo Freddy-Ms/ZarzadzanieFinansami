@@ -6,7 +6,11 @@ import os
 from Authentication import token_required, set_tokens_in_cookies
 import json
 from io import BytesIO
-
+from reg_lin import estimateExpenses
+from datetime import datetime
+from collections import defaultdict
+import numpy as np
+from calendar import monthrange
 
 app = Flask(__name__)
 CORS(app, supports_credentials = True)
@@ -389,6 +393,122 @@ def ocr_receipt():
     except Exception as e:
         return jsonify({'message': str(e)}), 500
 
+@app.route('/predict', methods=['POST'])
+@token_required
+def predict_expenses():
+    try:
+        data = request.get_json()
+        household_id = data.get('household_id')
+        user_id = g.user_id
+
+        # Pobierz eventy dla użytkownika lub householdu
+        if household_id:
+            events = PurchaseEvent.query.filter_by(household_id=household_id).all()
+        else:
+            events = PurchaseEvent.query.filter_by(user_id=user_id).all()
+
+        # Zgrupuj produkty wg miesięcy (format YYYY-MM)
+        monthly_totals = defaultdict(float)
+        current_month_key = datetime.today().strftime('%Y-%m')
+
+        for event in events:
+            if not event.date:
+                continue
+            month_key = event.date.strftime('%Y-%m')
+            for product in event.products:
+                if product.price:
+                    monthly_totals[month_key] += float(product.price)
+
+        # Posortuj po dacie
+        sorted_months = sorted(monthly_totals.keys())
+        MonthSpent = [monthly_totals[month] for month in sorted_months]
+
+        # Przewidywanie obecnego i przyszłego miesiąca
+        prediction_current = None
+        prediction_next = None
+
+        if current_month_key not in monthly_totals:
+            sorted_months.append(current_month_key)
+            MonthSpent.append(0.0)
+
+        # Obecny wydatek w aktualnym miesiącu
+        spent_this_month = monthly_totals.get(current_month_key, 0.0)
+
+        prediction_current = estimateExpenses(MonthSpent)  # Prognoza na ten miesiąc
+        prediction_next = estimateExpenses(MonthSpent + [prediction_current])  # Prognoza na kolejny
+
+        return jsonify({
+            'message': 'Prediction successful',
+            'spent_so_far_this_month': round(spent_this_month, 2),
+            'predicted_total_this_month': round(prediction_current, 2),
+            'predicted_total_next_month': round(prediction_next, 2),
+            'history': {
+                month: round(monthly_totals[month], 2) for month in sorted_months
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+@app.route('/summary/monthly', methods=['POST'])
+@token_required
+def get_monthly_summary():
+    try:
+        data = request.get_json()
+        month = int(data.get('month'))
+        year = int(data.get('year'))
+        household_id = data.get('household_id')
+        user_id = g.user_id
+
+        if not month or not year:
+            return jsonify({'message': 'Month and year are required'}), 400
+
+        start_date = datetime(year, month, 1)
+        end_date = datetime(year, month, monthrange(year, month)[1])
+
+        if household_id:
+            events = PurchaseEvent.query.filter(
+                PurchaseEvent.household_id == household_id,
+                PurchaseEvent.date >= start_date,
+                PurchaseEvent.date <= end_date
+            ).all()
+        else:
+            events = PurchaseEvent.query.filter(
+                PurchaseEvent.user_id == user_id,
+                PurchaseEvent.date >= start_date,
+                PurchaseEvent.date <= end_date
+            ).all()
+
+        result = defaultdict(lambda: defaultdict(float))  # category -> subcategory -> amount
+
+        for event in events:
+            for product in event.products:
+                price = float(product.price or 0.0)
+
+                subcat = product.subcategory
+                if subcat:
+                    cat_name = subcat.category.name if subcat.category else "Uncategorized"
+                    subcat_name = subcat.name
+                else:
+                    cat_name = "Uncategorized"
+                    subcat_name = "Uncategorized"
+
+                result[cat_name][subcat_name] += price
+
+        summary = []
+        for category, subcats in result.items():
+            summary.append({
+                "category": category,
+                "total": round(sum(subcats.values()), 2),
+                "subcategories": [
+                    {"name": name, "total": round(total, 2)} for name, total in subcats.items()
+                ]
+            })
+
+        return jsonify(summary), 200
+
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 
 if __name__ == '__main__':
