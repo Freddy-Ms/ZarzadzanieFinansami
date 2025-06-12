@@ -11,6 +11,7 @@ from datetime import datetime
 from collections import defaultdict
 import numpy as np
 from calendar import monthrange
+from RecieptOCRScanner import receipOCR
 
 app = Flask(__name__)
 CORS(app, supports_credentials = True)
@@ -365,20 +366,7 @@ def ocr_receipt():
         if not receipt_file:
             return jsonify({'message': 'No receipt file provided'}), 400
 
-        
-        # Simulating OCR result for demonstration purposes
-        ocr_result = {
-            'Milk': 1.50,
-            'Eggs': 3.20,
-            'Cheese': 4.50,
-            'Apples': 2.30,
-            'Bananas': 1.20,
-            'Chicken': 5.00,
-            'Rice': 1.80,
-            'Pasta': 1.60,
-            'Tomato Sauce': 2.50,
-            }
-        #ocr_result = SZYMON DO ROBOTY
+        ocr_result = receipOCR(receipt_file)
         products = []
         for name, price in ocr_result.items():
             products.append({
