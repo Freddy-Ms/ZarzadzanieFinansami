@@ -135,7 +135,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showPurchases(item: MenuItem){
-        Toast.makeText(this, "not implemented yet", Toast.LENGTH_SHORT)
+        val intent = Intent(this, ShowPurchaseActivity::class.java)
+        startActivity(intent)
     }
 }
 
