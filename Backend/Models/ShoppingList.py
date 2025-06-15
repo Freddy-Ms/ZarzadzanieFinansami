@@ -2,6 +2,7 @@ from . import db
 from .Household import Household
 from .HouseholdUser import HouseholdUser
 from sqlalchemy import CheckConstraint
+
 class ShoppingList(db.Model):
     __tablename__ = 'shopping_list'
 
@@ -62,7 +63,7 @@ class ShoppingList(db.Model):
                 
             db.session.add(shopping_list)
             db.session.commit()
-            return {'message': 'Shopping list created successfully'}, 201
+            return {'id': shopping_list.id, 'message': 'Shopping list created successfully'}, 201
         except Exception as e:
             db.session.rollback()
             return {'error': str(e)}, 500
@@ -99,3 +100,6 @@ class ShoppingList(db.Model):
 
         except Exception as e:
             return {'error': str(e)}, 500
+        
+    
+    

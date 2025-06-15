@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/login_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/editHouseholdName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Household name" />
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save name"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/white" />
+
+    <EditText
+        android:id="@+id/emailOrLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="User email"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/inviteButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Generate Invite Token"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tokenTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Token:"
+
+        android:textIsSelectable="true"
+        android:focusable="true"
+        android:longClickable="true"
+        android:textColor="@android:color/black" />
+
+    <Button
+        android:id="@+id/copyTokenButton"
+        android:background="@drawable/rounded_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Copy token" />
+
+    <SearchView
+        android:id="@+id/searchUsers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:queryHint="Search user..."
+        android:background="@drawable/rounded_background" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:id="@+id/userListLayout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+</LinearLayout>

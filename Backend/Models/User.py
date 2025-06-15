@@ -60,16 +60,17 @@ class User(db.Model):
             return {"message": str(e)}, 500
 
     @staticmethod
-    def login(data):
+    def login(data):   
         """Login a user with the provided data.
         The data should include 'username' or 'email', and 'password'.
-        Returns a tuple of (access_token, refresh_token), a message and status code."""
+        Returns a response dict and status code."""
         try:
             username = data.get('username')
             password = data.get('password')
             email = data.get('email')
+            
             if (not username and not email) or not password:
-                return None, {"message": "Missing required fields"}, 400
+                return {"message": "Missing required fields"}, 400
             
             if username:
                 user = User.query.filter_by(username=username).first()
@@ -77,13 +78,18 @@ class User(db.Model):
                 user = User.query.filter_by(email=email).first()
 
             if not user or not check_password_hash(user.password, password):
-                return None, {"message": "Invalid credentials"}, 401
+                return {"message": "Invalid credentials"}, 401
 
             access_token, refresh_token = generate_tokens(user.id)
 
-            return (access_token, refresh_token), {"message": "Login successful"}, 200
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "message": "Login successful"
+            }, 200
+
         except Exception as e:
-            return None, {"message": str(e)}, 500
+            return {"message": str(e)}, 500
         
     @staticmethod
     def delete(user_id):

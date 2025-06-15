@@ -22,8 +22,10 @@ def token_required(func):
             result = make_response(result[0], result[1])
 
         if response:
+            result.direct_passthrough = False
             response.set_data(result.get_data())
             response.status_code = result.status_code
+            response.headers = result.headers
             return response
         return result
     return decorated
@@ -76,7 +78,7 @@ def generate_tokens(user_id):
     """Generate access and refresh tokens for the user."""
     access_payload = {
         "user_id": user_id,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes = 15)
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes= 15)
     }
     refresh_payload = {
         "user_id": user_id,
