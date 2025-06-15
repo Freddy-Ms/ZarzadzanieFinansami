@@ -1,24 +1,32 @@
 package com.example.myfinances
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
-
 import android.os.Bundle
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import okhttp3.*
-import com.example.myfinances.ApiClient.client
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
 class EditShoppingListActivity : AppCompatActivity() {
+
     private lateinit var listNameTextView: TextView
     private lateinit var productsContainer: LinearLayout
-
-    private val unitList = mutableMapOf<Int, String>()
-    private val subcategoryList = mutableMapOf<Int, String>()
+    private lateinit var addProductButton: Button
 
     private var listId: Int = -1
+
+    private val unitList = mutableListOf<Pair<Int, String>>()
+    private val subcategoryList = mutableListOf<Pair<Int, String>>()
+
+    private val unitListWithUncategorized: List<Pair<Int?, String>>
+        get() = listOf(null to "Uncategorized") + unitList
+
+    private val subcategoryListWithUncategorized: List<Pair<Int?, String>>
+        get() = listOf(null to "Uncategorized") + subcategoryList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,40 +40,21 @@ class EditShoppingListActivity : AppCompatActivity() {
 
         listNameTextView = findViewById(R.id.listNameTextView)
         productsContainer = findViewById(R.id.productsContainer)
+        addProductButton = findViewById(R.id.addProductButton)
 
-        loadReferenceData()
-    }
+        addProductButton.setOnClickListener {
+            renderNewProductItem()
+        }
 
-    private fun loadReferenceData() {
-        val unitReq = Request.Builder().url("$BASE_URL/quantityunit/get").get().build()
-        val subcatReq = Request.Builder().url("$BASE_URL/subcategory/get").get().build()
-
-        client.newCall(unitReq).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread { Toast.makeText(this@EditShoppingListActivity, "Failed to load units", Toast.LENGTH_SHORT).show() }
-            }
-            override fun onResponse(call: Call, response: Response) {
-                val body = response.body?.string() ?: return
-                val arr = JSONArray(body)
-                for (i in 0 until arr.length()) {
-                    val obj = arr.getJSONObject(i)
-                    unitList[obj.getInt("id")] = obj.getString("name")
-                }
-                loadListDetails()
-            }
-        })
-
-        client.newCall(subcatReq).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) {
-                val body = response.body?.string() ?: return
-                val arr = JSONArray(body)
-                for (i in 0 until arr.length()) {
-                    val obj = arr.getJSONObject(i)
-                    subcategoryList[obj.getInt("id")] = obj.getString("name")
-                }
-            }
-        })
+        LoadData(
+            context = this,
+            unitList = unitList,
+            subcategoryList = subcategoryList,
+            onComplete = { loadListDetails() }
+        ).apply {
+            loadUnits()
+            loadSubcategories()
+        }
     }
 
     private fun loadListDetails() {
@@ -74,7 +63,7 @@ class EditShoppingListActivity : AppCompatActivity() {
             .get()
             .build()
 
-        client.newCall(req).enqueue(object : Callback {
+        ApiClient.client.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
                     Toast.makeText(this@EditShoppingListActivity, "Load failed", Toast.LENGTH_SHORT).show()
@@ -83,50 +72,146 @@ class EditShoppingListActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 val arr = JSONArray(response.body?.string() ?: "[]")
-                var found: JSONObject? = null
-                for (i in 0 until arr.length()) {
-                    val obj = arr.getJSONObject(i)
-                    if (obj.getInt("id") == listId) {
-                        found = obj
-                        break
-                    }
-                }
+                val found = (0 until arr.length()).map { arr.getJSONObject(it) }.find { it.getInt("id") == listId }
 
-                if (found == null) {
+                found?.let {
+                    val listName = it.optString("name", "")
+                    val prodArr = it.optJSONArray("products") ?: JSONArray()
+
                     runOnUiThread {
-                        Toast.makeText(this@EditShoppingListActivity, "List not found", Toast.LENGTH_SHORT).show()
-                        finish()
+                        listNameTextView.text = listName
+                        productsContainer.removeAllViews()
+                        for (i in 0 until prodArr.length()) {
+                            renderProductEditable(prodArr.getJSONObject(i))
+                        }
                     }
-                    return
-                }
-
-                val listName = found.optString("name", "")
-                val prodArr = found.optJSONArray("products") ?: JSONArray()
-
-                runOnUiThread {
-                    listNameTextView.text = listName
-                    productsContainer.removeAllViews()
-                    for (i in 0 until prodArr.length()) {
-                        val p = prodArr.getJSONObject(i)
-                        renderProductReadonly(p)
-                    }
+                } ?: runOnUiThread {
+                    Toast.makeText(this@EditShoppingListActivity, "List not found", Toast.LENGTH_SHORT).show()
+                    finish()
                 }
             }
         })
     }
 
-    private fun renderProductReadonly(product: JSONObject) {
-        val itemView = layoutInflater.inflate(R.layout.item_shopping_product_readonly, productsContainer, false)
+    @SuppressLint("SetTextI18n")
+    private fun renderProductEditable(product: JSONObject) {
+        val itemView = layoutInflater.inflate(R.layout.item_shopping_product_editable, productsContainer, false)
 
-        val name = product.optString("name", "")
-        val qty = product.optDouble("quantity", 0.0)
-        val unitId = product.optInt("unit_id", -1)
-        val subId = product.optInt("subcategory_id", -1)
+        val nameEdit = itemView.findViewById<EditText>(R.id.productNameEditText)
+        val qtyEdit = itemView.findViewById<EditText>(R.id.productQuantityEditText)
+        val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
+        val subSpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
+        val saveBtn = itemView.findViewById<Button>(R.id.saveButton)
+        val removeBtn = itemView.findViewById<Button>(R.id.removeButton)
 
-        itemView.findViewById<TextView>(R.id.productNameText).text = "• $name"
-        itemView.findViewById<TextView>(R.id.productDetailsText).text =
-            "Qty: $qty  | Unit: ${unitList[unitId] ?: "-"}  | Category: ${subcategoryList[subId] ?: "-"}"
-        // TODO: Add unit and category name from database
+        val productId = product.optInt("id")
+        nameEdit.setText(product.optString("name"))
+        qtyEdit.setText(product.optDouble("quantity", 1.0).toString())
+
+        unitSpinner.adapter = ArrayAdapter(this, R.layout.spinner_item, unitListWithUncategorized.map { it.second })
+        subSpinner.adapter = ArrayAdapter(this, R.layout.spinner_item, subcategoryListWithUncategorized.map { it.second })
+
+        unitSpinner.setSelection(unitListWithUncategorized.indexOfFirst { it.first == product.opt("unit_id") })
+        subSpinner.setSelection(subcategoryListWithUncategorized.indexOfFirst { it.first == product.opt("subcategory_id") })
+
+        saveBtn.setOnClickListener {
+            val json = JSONObject().apply {
+                put("id", productId)
+                put("name", nameEdit.text.toString().trim())
+                put("quantity", qtyEdit.text.toString().toDoubleOrNull() ?: 1.0)
+                put("unit_id", unitListWithUncategorized[unitSpinner.selectedItemPosition].first)
+                put("subcategory_id", subcategoryListWithUncategorized[subSpinner.selectedItemPosition].first)
+            }
+
+            val req = Request.Builder()
+                .url("$BASE_URL/shoppinglist/product/edit")
+                .post(json.toString().toRequestBody("application/json".toMediaTypeOrNull()))
+                .build()
+
+            ApiClient.client.newCall(req).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    runOnUiThread { Toast.makeText(this@EditShoppingListActivity, "Update failed", Toast.LENGTH_SHORT).show() }
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    runOnUiThread { Toast.makeText(this@EditShoppingListActivity, "Product updated", Toast.LENGTH_SHORT).show() }
+                }
+            })
+        }
+
+        removeBtn.setOnClickListener {
+            val req = Request.Builder()
+                .url("$BASE_URL/shoppinglist/product/remove")
+                .post(JSONObject().put("id", productId).toString().toRequestBody("application/json".toMediaTypeOrNull()))
+                .build()
+
+            ApiClient.client.newCall(req).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    runOnUiThread { Toast.makeText(this@EditShoppingListActivity, "Delete failed", Toast.LENGTH_SHORT).show() }
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    runOnUiThread {
+                        if (response.isSuccessful) {
+                            productsContainer.removeView(itemView)
+                            Toast.makeText(this@EditShoppingListActivity, "Product removed", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            })
+        }
+
+        productsContainer.addView(itemView)
+    }
+
+    private fun renderNewProductItem() {
+        val itemView = layoutInflater.inflate(R.layout.item_shopping_product_editable, productsContainer, false)
+
+        val nameEdit = itemView.findViewById<EditText>(R.id.productNameEditText)
+        val qtyEdit = itemView.findViewById<EditText>(R.id.productQuantityEditText)
+        val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
+        val subSpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
+        val saveBtn = itemView.findViewById<Button>(R.id.saveButton)
+        val removeBtn = itemView.findViewById<Button>(R.id.removeButton)
+
+        unitSpinner.adapter = ArrayAdapter(this, R.layout.spinner_item, unitListWithUncategorized.map { it.second })
+        subSpinner.adapter = ArrayAdapter(this, R.layout.spinner_item, subcategoryListWithUncategorized.map { it.second })
+
+        unitSpinner.setSelection(0)
+        subSpinner.setSelection(0)
+
+        saveBtn.setOnClickListener {
+            val json = JSONObject().apply {
+                put("list_id", listId)
+                put("name", nameEdit.text.toString().trim())
+                put("quantity", qtyEdit.text.toString().toDoubleOrNull() ?: 1.0)
+                put("unit_id", unitListWithUncategorized[unitSpinner.selectedItemPosition].first)
+                put("subcategory_id", subcategoryListWithUncategorized[subSpinner.selectedItemPosition].first)
+            }
+
+            val req = Request.Builder()
+                .url("$BASE_URL/shoppinglist/product/add")
+                .post(json.toString().toRequestBody("application/json".toMediaTypeOrNull()))
+                .build()
+
+            ApiClient.client.newCall(req).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    runOnUiThread { Toast.makeText(this@EditShoppingListActivity, "Add failed", Toast.LENGTH_SHORT).show() }
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    runOnUiThread {
+                        if (response.isSuccessful) {
+                            Toast.makeText(this@EditShoppingListActivity, "Product added", Toast.LENGTH_SHORT).show()
+                            productsContainer.removeView(itemView)
+                            loadListDetails()
+                        }
+                    }
+                }
+            })
+        }
+
+        removeBtn.setOnClickListener {
+            productsContainer.removeView(itemView)
+        }
+
         productsContainer.addView(itemView)
     }
 }

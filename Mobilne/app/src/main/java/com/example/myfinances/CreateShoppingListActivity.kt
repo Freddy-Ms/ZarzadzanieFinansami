@@ -59,11 +59,27 @@ class CreateShoppingListActivity : AppCompatActivity() {
         val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
         val subcategorySpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
 
-        unitSpinner.adapter = ArrayAdapter(this, R.layout.spinner_item, unitList.map { it.second })
-        subcategorySpinner.adapter = ArrayAdapter(this, R.layout.spinner_item, subcategoryList.map { it.second })
+        val unitListWithUncategorized = listOf(null to "Uncategorized") + unitList
+        val subcategoryListWithUncategorized = listOf(null to "Uncategorized") + subcategoryList
+
+        unitSpinner.adapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item,
+            unitListWithUncategorized.map { it.second }
+        )
+
+        subcategorySpinner.adapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item,
+            subcategoryListWithUncategorized.map { it.second }
+        )
+
+        unitSpinner.setSelection(0)
+        subcategorySpinner.setSelection(0)
 
         productsContainer.addView(itemView)
     }
+
 
     private fun saveShoppingList() {
         val listName = listNameEditText.text.toString().trim()
@@ -136,7 +152,7 @@ class CreateShoppingListActivity : AppCompatActivity() {
                 .post(json.toString().toRequestBody("application/json".toMediaTypeOrNull()))
                 .build()
 
-            ApiClient.client.newCall(request).enqueue(object : Callback {
+            client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     runOnUiThread {
                         Toast.makeText(this@CreateShoppingListActivity, "Failed to add product", Toast.LENGTH_SHORT).show()
