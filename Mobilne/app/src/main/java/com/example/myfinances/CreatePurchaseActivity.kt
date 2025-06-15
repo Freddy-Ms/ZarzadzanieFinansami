@@ -21,6 +21,8 @@ class CreatePurchaseActivity : AppCompatActivity() {
     private lateinit var saveButton: Button
     private lateinit var purchaseNameInput: EditText
     private lateinit var householdSpinner: Spinner
+    private lateinit var addProductButton: Button
+
 
     private lateinit var productArray: JSONArray
     private lateinit var photoFile: File
@@ -69,6 +71,11 @@ class CreatePurchaseActivity : AppCompatActivity() {
         saveButton.setOnClickListener {
             savePurchase()
         }
+        addProductButton = findViewById(R.id.addProductButton)
+        addProductButton.setOnClickListener {
+            addEmptyProductField()
+        }
+
     }
 
     private fun showReceiptPhoto(file: File) {
@@ -92,6 +99,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
             val priceInput = itemView.findViewById<EditText>(R.id.priceEditText)
             val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
             val subcategorySpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
+            val removeButton = itemView.findViewById<Button>(R.id.removeProductButton)
 
             nameInput.setText(product.getString("name"))
             quantityInput.setText(product.optDouble("quantity", 1.0).toString())
@@ -106,9 +114,14 @@ class CreatePurchaseActivity : AppCompatActivity() {
                 R.layout.spinner_item,
                 subcategoryList.map { it.second })
 
+            removeButton.setOnClickListener {
+                productListLayout.removeView(itemView)
+            }
+
             productListLayout.addView(itemView)
         }
     }
+
 
     private fun savePurchase() {
         val purchaseName = purchaseNameInput.text.toString().trim()
@@ -196,5 +209,30 @@ class CreatePurchaseActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun addEmptyProductField() {
+        val itemView = layoutInflater.inflate(R.layout.item_product_editable, productListLayout, false)
+
+        val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
+        val subcategorySpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
+        val removeButton = itemView.findViewById<Button>(R.id.removeProductButton)
+
+        unitSpinner.adapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item,
+            unitsList.map { it.second })
+
+        subcategorySpinner.adapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item,
+            subcategoryList.map { it.second })
+
+        removeButton.setOnClickListener {
+            productListLayout.removeView(itemView)
+        }
+
+        productListLayout.addView(itemView)
+    }
+
 
 }

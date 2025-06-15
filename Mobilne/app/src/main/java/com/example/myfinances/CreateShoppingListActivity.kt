@@ -48,7 +48,6 @@ class CreateShoppingListActivity : AppCompatActivity() {
         dataLoader.loadSubcategories()
         dataLoader.loadHouseholds()
 
-        renderProductItem()
         addProductButton.setOnClickListener { renderProductItem() }
 
         saveListButton.setOnClickListener { saveShoppingList() }
