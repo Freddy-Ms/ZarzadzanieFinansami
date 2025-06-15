@@ -3,39 +3,40 @@ import { Link } from "react-router-dom";
 export default function StartPage() {
     return (
         <div style={styles.wrapper}>
-            <h1 style={styles.title}>Witaj w aplikacji finansowej!</h1>
+            <h1 style={styles.title}>Welcome to the Scanalyze!</h1>
             <p style={styles.subtitle}>
-                Zarządzaj swoimi wydatkami z łatwością i przejrzystością.
+                Manage your expenses with ease and clarity.
             </p>
 
             <div style={styles.featuresContainer}>
                 <FeatureBox
-                    title="📋 Lista zakupów"
-                    desc="Twórz, edytuj i zarządzaj listami zakupów."
+                    title="📋 Shopping List"
+                    desc="Create, edit, and manage your shopping lists."
                 />
                 <FeatureBox
-                    title="🧾 Wczytywanie paragonów"
-                    desc="Skanuj paragony i śledź wydatki automatycznie."
+                    title="🧾 Receipt Scanning"
+                    desc="Scan receipts and track expenses automatically."
                 />
                 <FeatureBox
-                    title="📈 Predykcja wydatków"
-                    desc="Zobacz przewidywane koszty na podstawie historii."
+                    title="📈 Expense Prediction"
+                    desc="See projected costs based on your history."
                 />
                 <FeatureBox
-                    title="📊 Analiza wydatków"
-                    desc="Oglądaj wykresy i dowiedz się, na co wydajesz najwięcej."
+                    title="📊 Expense Analysis"
+                    desc="View charts and find out what you spend the most on."
                 />
             </div>
 
             <p style={styles.loginPrompt}>
                 <Link to="/login_register" style={styles.loginLink}>
-                    Zaloguj się
+                    Log in
                 </Link>
-                , aby zacząć korzystać!
+                , to get started!
             </p>
         </div>
     );
 }
+
 
 function FeatureBox({ title, desc }) {
     return (
