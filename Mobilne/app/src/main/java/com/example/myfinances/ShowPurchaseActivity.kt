@@ -123,7 +123,7 @@ class ShowPurchaseActivity : AppCompatActivity() {
             val editBtn = Button(this).apply {
                 text = "Edit"
                 setOnClickListener {
-                    val intent = Intent(this@ShowPurchaseActivity, EditHouseholdActivity::class.java)
+                    val intent = Intent(this@ShowPurchaseActivity, EditPurchaseActivity::class.java)
                     intent.putExtra("purchase_id", purchase.getInt("id"))
                     startActivity(intent)
                 }

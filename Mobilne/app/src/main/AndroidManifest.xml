@@ -57,6 +57,7 @@
         <activity android:name=".ShowShoppingListsActivity"/>
         <activity android:name=".EditShoppingListActivity"/>
         <activity android:name=".ShowPurchaseActivity"/>
+        <activity android:name="EditPurchaseActivity"/>
     </application>
 
 </manifest>
