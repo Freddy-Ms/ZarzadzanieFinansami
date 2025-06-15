@@ -21,8 +21,10 @@ class Product(db.Model):
             'id': self.id,
             'name': self.name,
             'quantity': self.quantity,
-            'unit_id': self.unit.name,
-            'subcategory_id': self.subcategory.name,
+            'unit_id': self.unit_id,
+            'unit_name': self.unit.name if self.unit else None,
+            'subcategory_id': self.subcategory_id,
+            'subcategory_name': self.subcategory.name if self.subcategory else None,
             'list_id': self.list_id
         }
     
