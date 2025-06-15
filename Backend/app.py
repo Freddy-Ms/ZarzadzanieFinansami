@@ -12,7 +12,6 @@ from collections import defaultdict
 import numpy as np
 from calendar import monthrange
 from RecieptOCRScanner import receipOCR
-import traceback
 
 app = Flask(__name__)
 CORS(app, supports_credentials = True)
@@ -380,7 +379,6 @@ def ocr_receipt():
 
         return jsonify({'message': 'OCR processed successfully', 'products': products}), 200
     except Exception as e:
-        print("❌ Błąd OCR:", traceback.format_exc())
         return jsonify({'message': str(e)}), 500
 
 @app.route('/predict', methods=['POST'])

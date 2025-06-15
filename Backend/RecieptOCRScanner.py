@@ -22,7 +22,7 @@ def receipOCR(img):
 
 
     # EasyOCR
-    reader = easyocr.Reader(['pl'], gpu=True)
+    reader = easyocr.Reader(['pl'], gpu=False)
     results = reader.readtext(processedImage)
 
     #sorting OCR resulst from up to down from left to right with bbox
