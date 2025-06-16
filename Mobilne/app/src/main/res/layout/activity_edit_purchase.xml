@@ -12,15 +12,25 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Nazwa listy -->
-        <TextView
-            android:id="@+id/listNameTextView"
+        <!-- Edytowalna nazwa zakupu -->
+        <EditText
+            android:id="@+id/purchaseNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Shopping List"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
+            android:hint="Purchase name"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rounded_background"
+            android:padding="12dp" />
+
+        <Button
+            android:id="@+id/saveNameButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Purchase Name"
+            android:background="@drawable/rounded_button"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Przycisk dodania nowego produktu -->
         <Button

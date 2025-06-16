@@ -6,11 +6,11 @@
         android:title="Purchase">
         <menu>
             <item
-                android:id="@+id/addReceipts"
+                android:id="@+id/addReceipt"
                 android:title="Add new purchase"
                 android:onClick="addReceipt" />
             <item
-                android:id="@+id/showPurhcases"
+                android:id="@+id/showPurchases"
                 android:title="Show all purchases"
                 android:onClick="showPurchases"/>
         </menu>
@@ -45,6 +45,7 @@
         </menu>
     </item>
     <item
+        android:id="@+id/logout"
         android:title="Logout"
         android:onClick="logout" />
 </menu>

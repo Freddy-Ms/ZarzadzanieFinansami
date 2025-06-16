@@ -47,6 +47,7 @@
         </activity>
         <activity android:name="RegisterActivity" />
         <activity android:name="MainActivity" />
+        <activity android:name=".BaseActivity"/>
         <activity android:name="ShowHouseholdActivity" />
         <activity android:name="CreateHouseholdActivity" />
         <activity android:name="EditHouseholdActivity" />
@@ -56,6 +57,8 @@
         <activity android:name=".CreateShoppingListActivity"/>
         <activity android:name=".ShowShoppingListsActivity"/>
         <activity android:name=".EditShoppingListActivity"/>
+        <activity android:name=".ShowPurchaseActivity"/>
+        <activity android:name="EditPurchaseActivity"/>
     </application>
 
 </manifest>

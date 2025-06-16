@@ -2,6 +2,7 @@ package com.example.myfinances
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myfinances.ApiClient.client
@@ -21,6 +22,8 @@ class CreatePurchaseActivity : AppCompatActivity() {
     private lateinit var saveButton: Button
     private lateinit var purchaseNameInput: EditText
     private lateinit var householdSpinner: Spinner
+    private lateinit var addProductButton: Button
+
 
     private lateinit var productArray: JSONArray
     private lateinit var photoFile: File
@@ -69,6 +72,11 @@ class CreatePurchaseActivity : AppCompatActivity() {
         saveButton.setOnClickListener {
             savePurchase()
         }
+        addProductButton = findViewById(R.id.addProductButton)
+        addProductButton.setOnClickListener {
+            addEmptyProductField()
+        }
+
     }
 
     private fun showReceiptPhoto(file: File) {
@@ -92,6 +100,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
             val priceInput = itemView.findViewById<EditText>(R.id.priceEditText)
             val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
             val subcategorySpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
+            val removeButton = itemView.findViewById<Button>(R.id.removeProductButton)
 
             nameInput.setText(product.getString("name"))
             quantityInput.setText(product.optDouble("quantity", 1.0).toString())
@@ -105,6 +114,10 @@ class CreatePurchaseActivity : AppCompatActivity() {
                 this,
                 R.layout.spinner_item,
                 subcategoryList.map { it.second })
+
+            removeButton.setOnClickListener {
+                productListLayout.removeView(itemView)
+            }
 
             productListLayout.addView(itemView)
         }
@@ -125,17 +138,23 @@ class CreatePurchaseActivity : AppCompatActivity() {
         for (i in 0 until productListLayout.childCount) {
             val itemView = productListLayout.getChildAt(i)
 
-            val name =
-                itemView.findViewById<EditText>(R.id.productNameEditText).text.toString().trim()
+            val name = itemView.findViewById<EditText>(R.id.productNameEditText).text.toString().trim()
             val quantity = itemView.findViewById<EditText>(R.id.productQuantityEditText).text.toString()
                 .toDoubleOrNull() ?: 1.0
-            val price =
-                itemView.findViewById<EditText>(R.id.priceEditText).text.toString().toDoubleOrNull()
-                    ?: 0.00
-            val unitId =
-                unitsList.getOrNull(itemView.findViewById<Spinner>(R.id.unitSpinner).selectedItemPosition)?.first
-            val subcategoryId =
-                subcategoryList.getOrNull(itemView.findViewById<Spinner>(R.id.subcategorySpinner).selectedItemPosition)?.first
+            val price = itemView.findViewById<EditText>(R.id.priceEditText).text.toString()
+                .toDoubleOrNull() ?: 0.00
+
+            val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
+            val subcategorySpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
+
+            val unitPosition = unitSpinner.selectedItemPosition
+            val subcategoryPosition = subcategorySpinner.selectedItemPosition
+
+            val unitsListWithUncategorized = listOf(null to "Uncategorized") + unitsList
+            val subcategoryListWithUncategorized = listOf(null to "Uncategorized") + subcategoryList
+
+            val unitId = unitsListWithUncategorized.getOrNull(unitPosition)?.first
+            val subcategoryId = subcategoryListWithUncategorized.getOrNull(subcategoryPosition)?.first
 
             val obj = JSONObject()
             obj.put("name", name)
@@ -196,5 +215,63 @@ class CreatePurchaseActivity : AppCompatActivity() {
             }
         })
     }
+
+
+    private fun addEmptyProductField() {
+        val itemView = layoutInflater.inflate(R.layout.item_product_editable, productListLayout, false)
+
+        val unitSpinner = itemView.findViewById<Spinner>(R.id.unitSpinner)
+        val subcategorySpinner = itemView.findViewById<Spinner>(R.id.subcategorySpinner)
+        val removeButton = itemView.findViewById<Button>(R.id.removeProductButton)
+
+        val unitsListWithNull = listOf(null to "Uncategorized") + unitsList
+        val subcategoryListWithNull = listOf(null to "Uncategorized") + subcategoryList
+
+        unitSpinner.adapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item,
+            unitsListWithNull.map { it.second }
+        )
+
+        subcategorySpinner.adapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item,
+            subcategoryListWithNull.map { it.second }
+        )
+
+        removeButton.setOnClickListener {
+            productListLayout.removeView(itemView)
+        }
+
+        unitSpinner.setSelection(0)
+        subcategorySpinner.setSelection(0)
+
+        productListLayout.addView(itemView)
+
+        var unitId: Int? = null
+        var subcategoryId: Int? = null
+
+        unitSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                unitId = unitsListWithNull[position].first
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                unitId = null
+            }
+        }
+
+        subcategorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                subcategoryId = subcategoryListWithNull[position].first
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                subcategoryId = null
+            }
+        }
+    }
+
+
 
 }

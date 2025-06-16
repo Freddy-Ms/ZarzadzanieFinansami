@@ -389,13 +389,11 @@ def predict_expenses():
         household_id = data.get('household_id')
         user_id = g.user_id
 
-        # Pobierz eventy dla użytkownika lub householdu
         if household_id:
             events = PurchaseEvent.query.filter_by(household_id=household_id).all()
         else:
             events = PurchaseEvent.query.filter_by(user_id=user_id).all()
 
-        # Zgrupuj produkty wg miesięcy (format YYYY-MM)
         monthly_totals = defaultdict(float)
         current_month_key = datetime.today().strftime('%Y-%m')
 
@@ -407,11 +405,9 @@ def predict_expenses():
                 if product.price:
                     monthly_totals[month_key] += float(product.price)
 
-        # Posortuj po dacie
         sorted_months = sorted(monthly_totals.keys())
         MonthSpent = [monthly_totals[month] for month in sorted_months]
 
-        # Przewidywanie obecnego i przyszłego miesiąca
         prediction_current = None
         prediction_next = None
 
@@ -419,11 +415,10 @@ def predict_expenses():
             sorted_months.append(current_month_key)
             MonthSpent.append(0.0)
 
-        # Obecny wydatek w aktualnym miesiącu
         spent_this_month = monthly_totals.get(current_month_key, 0.0)
 
-        prediction_current = estimateExpenses(MonthSpent)  # Prognoza na ten miesiąc
-        prediction_next = estimateExpenses(MonthSpent + [prediction_current])  # Prognoza na kolejny
+        prediction_current = estimateExpenses(MonthSpent) 
+        prediction_next = estimateExpenses(MonthSpent + [prediction_current])  
 
         return jsonify({
             'message': 'Prediction successful',
