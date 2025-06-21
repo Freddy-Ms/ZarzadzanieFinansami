@@ -19,6 +19,8 @@ export default function SimpleModal({
                         onClick={handleDeleteList}
                         style={styles.deleteButton}
                         title="Delete list"
+                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#e63946")}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#ff4d4d")}
                     >
                         🗑️
                     </button>
@@ -26,8 +28,10 @@ export default function SimpleModal({
                         onClick={onClose}
                         style={styles.buttonCancel}
                         aria-label="Close modal"
+                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#b0b0b0")}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#ccc")}
                     >
-                        X
+                        ×
                     </button>
                 </div>
             </div>
@@ -39,7 +43,7 @@ export default function SimpleModal({
                     <ul style={styles.list}>
                         {products.map((product, index) => (
                             <li
-                                key={index}
+                                key={product.id}
                                 style={{
                                     ...styles.listItem,
                                     borderBottom:
@@ -49,14 +53,9 @@ export default function SimpleModal({
                                 }}
                             >
                                 <div style={styles.productContent}>
-                                    <span>
+                                    <span style={styles.productName}>
                                         {product.name}{" "}
-                                        <span
-                                            style={{
-                                                fontWeight: "600",
-                                                color: "#555",
-                                            }}
-                                        >
+                                        <span style={styles.productQuantity}>
                                             ({product.quantity})
                                         </span>
                                     </span>
@@ -68,14 +67,20 @@ export default function SimpleModal({
                                                 setIsEditMode(true);
                                                 setProductId(product.id);
                                             }}
+                                            title="Edit product"
+                                            onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#d6e9ff")}
+                                            onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#f0f8ff")}
                                         >
                                             ✏️
                                         </button>
                                         <button
-                                            style={styles.deleteButton}
+                                            style={styles.deleteButtonSmall}
                                             onClick={() => {
                                                 handleDeleteProduct(product.id);
                                             }}
+                                            title="Delete product"
+                                            onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#e63946")}
+                                            onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#ff4d4d")}
                                         >
                                             🗑️
                                         </button>
@@ -89,19 +94,15 @@ export default function SimpleModal({
                 )}
             </div>
 
-            <div style={{ textAlign: "center" }}>
+            <div style={styles.addButtonWrapper}>
                 <button
                     onClick={() => {
                         setShowExtendedModal(true);
                         setIsEditMode(false);
                     }}
                     style={styles.buttonAdd}
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#218838")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#28a745")
-                    }
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#2c7a2c")}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#28a745")}
                 >
                     ➕ Add product
                 </button>
@@ -119,98 +120,158 @@ const styles = {
         padding: "24px",
         borderRadius: "12px",
         width: "100%",
-        margin: "20px",
-        maxWidth: "500px",
+        maxWidth: "520px",
         maxHeight: "90vh",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+        display: "flex",
         flexDirection: "column",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
     },
     header: {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "16px",
-        paddingBottom: "10px",
+        marginBottom: "20px",
+        borderBottom: "1px solid #eee",
+        paddingBottom: "12px",
+    },
+    buttonsContainer: {
+        display: "flex",
+        gap: "10px",
     },
     title: {
         margin: 0,
-        fontSize: "1.5rem",
-        fontWeight: "bold",
+        fontSize: "1.75rem",
+        fontWeight: "700",
+        color: "#222",
+    },
+    section: {
+        flex: "1",
+        overflowY: "auto",
+        marginBottom: "20px",
     },
     subtitle: {
-        margin: "0 0 8px 0",
-        fontWeight: "500",
+        margin: "0 0 12px 0",
+        fontWeight: "600",
+        fontSize: "1.1rem",
+        color: "#333",
     },
     list: {
         listStyleType: "none",
         padding: 0,
-        maxHeight: "60vh",
+        maxHeight: "55vh",
         overflowY: "auto",
-        border: "1px solid #ccc",
-        borderRadius: "6px",
-        backgroundColor: "#f9f9f9",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        backgroundColor: "#fafafa",
     },
     listItem: {
-        padding: "10px 15px",
-        borderBottom: "1px solid #ddd",
+        padding: "12px 20px",
         fontSize: "1rem",
         color: "#444",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        transition: "background-color 0.2s ease",
+    },
+    productContent: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
+    },
+    productName: {
+        fontWeight: "600",
+        color: "#222",
+    },
+    productQuantity: {
+        fontWeight: "500",
+        color: "#555",
+        marginLeft: "6px",
+        fontSize: "0.9rem",
+    },
+    productButtons: {
+        display: "flex",
+        gap: "10px",
+    },
+    editButton: {
+        padding: "6px 12px",
+        backgroundColor: "#f0f8ff",
+        border: "1px solid #a0c4ff",
+        borderRadius: "6px",
+        cursor: "pointer",
+        fontSize: "1rem",
+        transition: "background-color 0.2s ease",
+    },
+    deleteButtonSmall: {
+        padding: "6px 12px",
+        backgroundColor: "#ff4d4d",
+        border: "none",
+        borderRadius: "6px",
+        color: "white",
+        cursor: "pointer",
+        fontSize: "1rem",
+        transition: "background-color 0.2s ease",
     },
     noItems: {
         fontStyle: "italic",
-        color: "#666",
+        color: "#777",
+        padding: "12px 0",
+        textAlign: "center",
+    },
+    addButtonWrapper: {
+        textAlign: "center",
+        marginBottom: "10px",
     },
     buttonAdd: {
-        padding: "10px 16px",
-        backgroundColor: "#4a90e2",
+        padding: "12px 24px",
+        backgroundColor: "#28a745",
         color: "#fff",
         border: "none",
-        borderRadius: "6px",
+        borderRadius: "8px",
         cursor: "pointer",
-        fontWeight: "600",
-        marginRight: "8px",
+        fontWeight: "700",
+        fontSize: "1rem",
+        transition: "background-color 0.3s ease",
+        boxShadow: "0 3px 8px rgba(40, 167, 69, 0.5)",
     },
     buttonCancel: {
         padding: "10px 16px",
         backgroundColor: "#ccc",
         color: "#333",
         border: "none",
-        borderRadius: "6px",
+        borderRadius: "8px",
         cursor: "pointer",
-        fontWeight: "600",
-    },
-    error: {
-        marginTop: "12px",
-        color: "red",
-        fontWeight: "600",
-    },
-    message: {
-        marginTop: "12px",
-        color: "green",
-        fontWeight: "600",
+        fontWeight: "700",
+        fontSize: "1.1rem",
+        transition: "background-color 0.3s ease",
     },
     deleteButton: {
-        padding: "6px 12px",
+        padding: "8px 14px",
         backgroundColor: "#ff4d4d",
         border: "none",
-        borderRadius: "4px",
+        borderRadius: "8px",
         color: "white",
         cursor: "pointer",
+        fontSize: "1.1rem",
+        transition: "background-color 0.3s ease",
     },
-    productContent: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
+    error: {
+        marginTop: "16px",
+        color: "#d32f2f",
+        fontWeight: "700",
+        textAlign: "center",
+        backgroundColor: "#fbeaea",
+        padding: "8px",
+        borderRadius: "6px",
     },
-    productButtons: {
-        display: "flex",
-        gap: "8px",
-    },
-    editButton: {
-        padding: "4px 8px",
-        backgroundColor: "#f0f0f0",
-        border: "1px solid #ccc",
-        borderRadius: "4px",
-        cursor: "pointer",
+    message: {
+        marginTop: "16px",
+        color: "#2e7d32",
+        fontWeight: "700",
+        textAlign: "center",
+        backgroundColor: "#e6f4ea",
+        padding: "8px",
+        borderRadius: "6px",
     },
 };

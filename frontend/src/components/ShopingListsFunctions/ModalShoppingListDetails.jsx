@@ -132,7 +132,7 @@ export default function ModalShoppingListDetails({ list, onClose, onUpdated }) {
                 "http://127.0.0.1:5000/shoppinglist/product/remove",
                 {
                     method: "POST",
-                    credentials: "include", // tak jak w handleAddProduct
+                    credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
                     },
