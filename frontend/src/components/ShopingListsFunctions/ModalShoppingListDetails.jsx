@@ -44,7 +44,7 @@ export default function ModalShoppingListDetails({ list, onClose, onUpdated }) {
                 setMessage("");
             }, 3000);
 
-            return () => clearTimeout(timer); 
+            return () => clearTimeout(timer);
         }
     }, [error, message]);
 
@@ -110,15 +110,45 @@ export default function ModalShoppingListDetails({ list, onClose, onUpdated }) {
             );
             const data = await res.json();
             if (!res.ok)
-                throw new Error(
-                    data.message || "Failed to edit product"
-                );
+                throw new Error(data.message || "Failed to edit product");
             setMessage(data.message || "Product updated");
             setProducts((prev) =>
                 prev.map((p) => (p.id === productId ? { ...p, ...product } : p))
             );
 
             if (onUpdated) onUpdated();
+            setShowExtendedModal(false);
+            setShowSimpleModal(true);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleDeleteProduct = async (productId) => {
+        setError(null);
+        setMessage(null);
+        try {
+            const res = await fetch(
+                "http://127.0.0.1:5000/shoppinglist/product/remove",
+                {
+                    method: "POST",
+                    credentials: "include", // tak jak w handleAddProduct
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id: productId }),
+                }
+            );
+            const data = await res.json();
+            if (!res.ok)
+                throw new Error(data.message || "Failed to delete product");
+
+            setMessage(data.message || "Product removed");
+
+            setProducts((prev) => prev.filter((p) => p.id !== productId));
+
+            if (onUpdated) onUpdated();
+
             setShowExtendedModal(false);
             setShowSimpleModal(true);
         } catch (err) {
@@ -162,6 +192,7 @@ export default function ModalShoppingListDetails({ list, onClose, onUpdated }) {
                             handleDeleteList={handleDeleteList}
                             setIsEditMode={setIsEditMode}
                             setProductId={setProductId}
+                            handleDeleteProduct={handleDeleteProduct}
                         />
                     )}
                     {showExtendedModal && (

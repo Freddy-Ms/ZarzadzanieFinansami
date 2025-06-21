@@ -8,6 +8,7 @@ export default function SimpleModal({
     handleDeleteList,
     setIsEditMode,
     setProductId,
+    handleDeleteProduct,
 }) {
     return (
         <div style={styles.modal}>
@@ -73,7 +74,7 @@ export default function SimpleModal({
                                         <button
                                             style={styles.deleteButton}
                                             onClick={() => {
-                                                setShowExtendedModal(true);
+                                                handleDeleteProduct(product.id);
                                             }}
                                         >
                                             🗑️
