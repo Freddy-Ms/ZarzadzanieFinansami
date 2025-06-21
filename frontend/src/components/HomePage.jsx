@@ -1,9 +1,23 @@
 import React, { useState } from "react";
-import {PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, } from "recharts";
+import { useNavigate } from "react-router-dom";
+import {
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    Legend,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    ResponsiveContainer,
+} from "recharts";
 import Sidebar from "./ShopingListsFunctions/ShopingListsFun";
 import ShoppingLists from "./ShopingListsFunctions/ShopingListsFun";
 
 export default function HomePage() {
+    const navigate = useNavigate();
     const chartData = [
         { name: "Food", value: 300 },
         { name: "Transport", value: 150 },
@@ -28,15 +42,74 @@ export default function HomePage() {
         predicted_total_next_month: 460.8,
     };
 
+    const handleLogout = () => {
+        navigate("/");
+    };
+
     return (
         <div style={styles.container}>
-            <header style={styles.topBar}>
+            <header
+                style={{
+                    ...styles.topBar,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}
+            >
                 <h1 style={styles.logo}>Scanalyze</h1>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                    }}
+                >
+                    {/* Ikona Profil */}
+                    <div
+                        style={{ cursor: "pointer", width: 32, height: 32 }}
+                        onClick={() => navigate("/profile")}
+                        title="Profil"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="32"
+                            height="32"
+                        >
+                            <circle cx="12" cy="7" r="4" />
+                            <path d="M5.5 21a6.5 6.5 0 0 1 13 0" />
+                        </svg>
+                    </div>
+
+                    {/* Ikona Wylogowania */}
+                    <div
+                        style={{ cursor: "pointer", width: 32, height: 32 }}
+                        onClick={handleLogout}
+                        title="Wyloguj się"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="32"
+                            height="32"
+                        >
+                            <path d="M16 17l5-5-5-5" />
+                            <path d="M21 12H9" />
+                            <path d="M9 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
+                        </svg>
+                    </div>
+                </div>
             </header>
 
             <div style={styles.main}>
                 <nav style={styles.sidebar}>
-                    <ShoppingLists/>
+                    <ShoppingLists />
                 </nav>
 
                 <div style={styles.contentGrid}>

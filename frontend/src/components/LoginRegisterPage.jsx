@@ -41,12 +41,10 @@ export default function LoginRegisterPage() {
             console.log("Message content:", data.message);
 
             if (response.status !== 200) {
-                setErrorMsg(`${data.message}`);
                 toast.error("Login error: " + data.message, {
                     autoClose: 3000,
                 });
             } else {
-                setErrorMsg(`${data.message}`);
                 toast.success("Logged in!", { autoClose: 3000 });
                 navigate("/homepage");
             }
@@ -81,12 +79,10 @@ export default function LoginRegisterPage() {
             console.log("Message content:", data.message);
 
             if (response.status !== 201) {
-                setRegisterMsg(`${data.message}`);
                 toast.error("Registration error: " + data.message, {
                     autoClose: 3000,
                 });
             } else {
-                setRegisterMsg(`${data.message}`);
                 toast.success("Registered! Please log in now.", {
                     autoClose: 3000,
                 });
@@ -155,7 +151,9 @@ export default function LoginRegisterPage() {
                         <button type="submit" style={styles.button}>
                             Register
                         </button>
-                        {registerMsg && <p style={styles.error}>{registerMsg}</p>}
+                        {registerMsg && (
+                            <p style={styles.error}>{registerMsg}</p>
+                        )}
                     </form>
                 </div>
             </div>
