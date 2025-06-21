@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, } from "recharts";
-import Sidebar from "./HomePageFunctions/ShopingListsFun";
-import ShoppingLists from "./HomePageFunctions/ShopingListsFun";
+import Sidebar from "./ShopingListsFunctions/ShopingListsFun";
+import ShoppingLists from "./ShopingListsFunctions/ShopingListsFun";
 
 export default function HomePage() {
     const chartData = [
@@ -228,6 +228,7 @@ const styles = {
         backgroundColor: "#ffffff",
         padding: "1rem",
         minWidth: "200px",
+        maxWidth: "200px",
         gap: "1rem",
         color: "black",
     },
