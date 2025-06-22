@@ -128,179 +128,188 @@ const ProfilePage = () => {
     return (
         <div style={styles.pageWrapper}>
             <div style={styles.outerContainer}>
-                <div style={styles.topRow}>
-                    <button
-                        style={styles.backButton}
-                        onClick={() => navigate("/homepage")}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.backgroundColor =
-                                styles.hoverEffects.backButtonHover.backgroundColor)
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.backgroundColor =
-                                styles.backButton.backgroundColor)
-                        }
-                    >
-                        ← Back
-                    </button>
+                <button
+                    style={styles.backButton}
+                    onClick={() => navigate("/homepage")}
+                    onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                            styles.hoverEffects.backButtonHover.backgroundColor)
+                    }
+                    onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                            styles.backButton.backgroundColor)
+                    }
+                >
+                    ← Back
+                </button>
 
-                    <div style={styles.panel}>
-                        <h2 style={styles.title}>User Profile</h2>
+                <div style={styles.twoColumnRow}>
+                    <div style={styles.leftPanel}>
+                        <div style={styles.panel}>
+                            <h2 style={styles.title}>User Profile</h2>
 
-                        {error && (
-                            <p style={{ color: "#f87171", marginBottom: 10 }}>
-                                {error}
-                            </p>
-                        )}
+                            {error && (
+                                <p
+                                    style={{
+                                        color: "#f87171",
+                                        marginBottom: 10,
+                                    }}
+                                >
+                                    {error}
+                                </p>
+                            )}
 
-                        {user ? (
-                            <div style={styles.infoBox}>
-                                {isEditing ? (
-                                    <>
-                                        <label style={styles.label}>
-                                            Name:
-                                            <input
-                                                type="text"
-                                                value={username}
-                                                onChange={(e) =>
-                                                    setName(e.target.value)
-                                                }
-                                                style={styles.input}
-                                                placeholder="Enter your name"
-                                                onFocus={(e) =>
-                                                    (e.currentTarget.style.borderColor =
-                                                        styles.inputFocus.borderColor)
-                                                }
-                                                onBlur={(e) =>
-                                                    (e.currentTarget.style.borderColor =
-                                                        styles.input.borderColor)
-                                                }
-                                            />
-                                        </label>
-                                        <label style={styles.label}>
-                                            Email:
-                                            <input
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) =>
-                                                    setEmail(e.target.value)
-                                                }
-                                                style={styles.input}
-                                                placeholder="Enter your email"
-                                                onFocus={(e) =>
-                                                    (e.currentTarget.style.borderColor =
-                                                        styles.inputFocus.borderColor)
-                                                }
-                                                onBlur={(e) =>
-                                                    (e.currentTarget.style.borderColor =
-                                                        styles.input.borderColor)
-                                                }
-                                            />
-                                        </label>
-                                        <p>
-                                            <strong>Household:</strong>{" "}
-                                            {household && household.length > 0
-                                                ? household
-                                                      .map((h) => h.name)
-                                                      .join(", ")
-                                                : "No household assigned"}
-                                        </p>
+                            {user ? (
+                                <div style={styles.infoBox}>
+                                    {isEditing ? (
+                                        <>
+                                            <label style={styles.label}>
+                                                Name:
+                                                <input
+                                                    type="text"
+                                                    value={username}
+                                                    onChange={(e) =>
+                                                        setName(e.target.value)
+                                                    }
+                                                    style={styles.input}
+                                                    placeholder="Enter your name"
+                                                    onFocus={(e) =>
+                                                        (e.currentTarget.style.borderColor =
+                                                            styles.inputFocus.borderColor)
+                                                    }
+                                                    onBlur={(e) =>
+                                                        (e.currentTarget.style.borderColor =
+                                                            styles.input.borderColor)
+                                                    }
+                                                />
+                                            </label>
+                                            <label style={styles.label}>
+                                                Email:
+                                                <input
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) =>
+                                                        setEmail(e.target.value)
+                                                    }
+                                                    style={styles.input}
+                                                    placeholder="Enter your email"
+                                                    onFocus={(e) =>
+                                                        (e.currentTarget.style.borderColor =
+                                                            styles.inputFocus.borderColor)
+                                                    }
+                                                    onBlur={(e) =>
+                                                        (e.currentTarget.style.borderColor =
+                                                            styles.input.borderColor)
+                                                    }
+                                                />
+                                            </label>
+                                            <p>
+                                                <strong>Household:</strong>{" "}
+                                                {household &&
+                                                household.length > 0
+                                                    ? household
+                                                          .map((h) => h.name)
+                                                          .join(", ")
+                                                    : "No household assigned"}
+                                            </p>
 
-                                        <div style={styles.buttonRow}>
-                                            <button
-                                                style={styles.saveButton}
-                                                onMouseEnter={(e) =>
-                                                    (e.currentTarget.style.backgroundColor =
-                                                        styles.hoverEffects.saveButtonHover.backgroundColor)
-                                                }
-                                                onMouseLeave={(e) =>
-                                                    (e.currentTarget.style.backgroundColor =
-                                                        styles.saveButton.backgroundColor)
-                                                }
-                                                onClick={handleSave}
-                                            >
-                                                Save
-                                            </button>
-                                            <button
-                                                style={styles.cancelButton}
-                                                onMouseEnter={(e) =>
-                                                    (e.currentTarget.style.backgroundColor =
-                                                        styles.hoverEffects.cancelButtonHover.backgroundColor)
-                                                }
-                                                onMouseLeave={(e) =>
-                                                    (e.currentTarget.style.backgroundColor =
-                                                        styles.cancelButton.backgroundColor)
-                                                }
-                                                onClick={handleCancel}
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p>
-                                            <strong>Name:</strong>{" "}
-                                            {user.username}
-                                        </p>
-                                        <p>
-                                            <strong>Email:</strong> {user.email}
-                                        </p>
-                                        <p>
-                                            <strong>Household:</strong>{" "}
-                                            {household && household.length > 0
-                                                ? household
-                                                      .map((h) => h.name)
-                                                      .join(", ")
-                                                : "No household assigned"}
-                                        </p>
-                                    </>
-                                )}
+                                            <div style={styles.buttonRow}>
+                                                <button
+                                                    style={styles.saveButton}
+                                                    onMouseEnter={(e) =>
+                                                        (e.currentTarget.style.backgroundColor =
+                                                            styles.hoverEffects.saveButtonHover.backgroundColor)
+                                                    }
+                                                    onMouseLeave={(e) =>
+                                                        (e.currentTarget.style.backgroundColor =
+                                                            styles.saveButton.backgroundColor)
+                                                    }
+                                                    onClick={handleSave}
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    style={styles.cancelButton}
+                                                    onMouseEnter={(e) =>
+                                                        (e.currentTarget.style.backgroundColor =
+                                                            styles.hoverEffects.cancelButtonHover.backgroundColor)
+                                                    }
+                                                    onMouseLeave={(e) =>
+                                                        (e.currentTarget.style.backgroundColor =
+                                                            styles.cancelButton.backgroundColor)
+                                                    }
+                                                    onClick={handleCancel}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p>
+                                                <strong>Name:</strong>{" "}
+                                                {user.username}
+                                            </p>
+                                            <p>
+                                                <strong>Email:</strong>{" "}
+                                                {user.email}
+                                            </p>
+                                            <p>
+                                                <strong>Household:</strong>{" "}
+                                                {household &&
+                                                household.length > 0
+                                                    ? household
+                                                          .map((h) => h.name)
+                                                          .join(", ")
+                                                    : "No household assigned"}
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
+                            ) : (
+                                !error && <p>Loading data...</p>
+                            )}
+
+                            <div style={styles.buttonsRow}>
+                                <button
+                                    style={{
+                                        ...styles.button,
+                                        ...styles.editButton,
+                                    }}
+                                    onMouseEnter={(e) =>
+                                        (e.currentTarget.style.backgroundColor =
+                                            styles.hoverEffects.editButtonHover.backgroundColor)
+                                    }
+                                    onMouseLeave={(e) =>
+                                        (e.currentTarget.style.backgroundColor =
+                                            styles.editButton.backgroundColor)
+                                    }
+                                    onClick={handleEditClick}
+                                >
+                                    Edit Account
+                                </button>
+                                <button
+                                    style={{
+                                        ...styles.button,
+                                        ...styles.deleteButton,
+                                    }}
+                                    onMouseEnter={(e) =>
+                                        (e.currentTarget.style.backgroundColor =
+                                            styles.hoverEffects.deleteButtonHover.backgroundColor)
+                                    }
+                                    onMouseLeave={(e) =>
+                                        (e.currentTarget.style.backgroundColor =
+                                            styles.deleteButton.backgroundColor)
+                                    }
+                                    onClick={handleDelete}
+                                >
+                                    Delete Account
+                                </button>
                             </div>
-                        ) : (
-                            !error && <p>Loading data...</p>
-                        )}
-
-                        <div style={styles.buttonsRow}>
-                            <button
-                                style={{
-                                    ...styles.button,
-                                    ...styles.editButton,
-                                }}
-                                onMouseEnter={(e) =>
-                                    (e.currentTarget.style.backgroundColor =
-                                        styles.hoverEffects.editButtonHover.backgroundColor)
-                                }
-                                onMouseLeave={(e) =>
-                                    (e.currentTarget.style.backgroundColor =
-                                        styles.editButton.backgroundColor)
-                                }
-                                onClick={handleEditClick}
-                            >
-                                Edit Account
-                            </button>
-                            <button
-                                style={{
-                                    ...styles.button,
-                                    ...styles.deleteButton,
-                                }}
-                                onMouseEnter={(e) =>
-                                    (e.currentTarget.style.backgroundColor =
-                                        styles.hoverEffects.deleteButtonHover.backgroundColor)
-                                }
-                                onMouseLeave={(e) =>
-                                    (e.currentTarget.style.backgroundColor =
-                                        styles.deleteButton.backgroundColor)
-                                }
-                                onClick={handleDelete}
-                            >
-                                Delete Account
-                            </button>
                         </div>
                     </div>
 
-                    {/* Household Panel */}
-                    <div style={styles.fullWidthPanel}>
+                    <div style={styles.rightPanel}>
                         <h2 style={styles.title}>Households You Belong To</h2>
                         {household.length > 0 ? (
                             <ul
@@ -335,26 +344,16 @@ const styles = {
         width: "100vw",
         boxSizing: "border-box",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        color: "#1e293b", 
+        color: "#1e293b",
     },
-
     outerContainer: {
         display: "flex",
         flexDirection: "column",
         gap: "24px",
         width: "100%",
-        maxWidth: "1200px",
+        maxWidth: "1400px",
         margin: "0 auto",
     },
-
-    topRow: {
-        display: "flex",
-        gap: "24px",
-        flexWrap: "nowrap",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-    },
-
     panel: {
         backgroundColor: "#fff",
         borderRadius: "12px",
@@ -366,23 +365,12 @@ const styles = {
         justifyContent: "space-between",
         color: "#1e293b",
     },
-
-    fullWidthPanel: {
-        backgroundColor: "#fff", 
-        borderRadius: "12px",
-        padding: "24px",
-        boxShadow: "0 6px 12px rgba(0,0,0,0.08)",
-        marginTop: "16px",
-        color: "#1e293b",
-    },
-
     title: {
         marginBottom: "16px",
         fontSize: "1.75rem",
         fontWeight: "600",
         color: "#1e293b",
     },
-
     infoBox: {
         backgroundColor: "#f9fafb",
         padding: "16px",
@@ -391,7 +379,6 @@ const styles = {
         boxShadow: "inset 0 0 8px rgba(0,0,0,0.05)",
         color: "#1e293b",
     },
-
     label: {
         display: "block",
         marginBottom: "12px",
@@ -399,7 +386,6 @@ const styles = {
         fontSize: "1rem",
         color: "#334155",
     },
-
     input: {
         width: "100%",
         padding: "10px 12px",
@@ -410,21 +396,18 @@ const styles = {
         color: "#1e293b",
         backgroundColor: "#fff",
     },
-
     buttonRow: {
         display: "flex",
         gap: "14px",
         marginTop: "14px",
         flexWrap: "wrap",
     },
-
     buttonsRow: {
         marginTop: "20px",
         display: "flex",
         gap: "14px",
         flexWrap: "wrap",
     },
-
     button: {
         padding: "12px 18px",
         borderRadius: "8px",
@@ -436,27 +419,22 @@ const styles = {
         userSelect: "none",
         color: "#fff",
     },
-
     editButton: {
         backgroundColor: "#38bdf8",
     },
-
     deleteButton: {
         backgroundColor: "#ef4444",
     },
-
     saveButton: {
         backgroundColor: "#10b981",
         padding: "12px 18px",
         borderRadius: "8px",
     },
-
     cancelButton: {
         backgroundColor: "#94a3b8",
         padding: "12px 18px",
         borderRadius: "8px",
     },
-
     backButton: {
         backgroundColor: "#58a7fc",
         border: "none",
@@ -483,6 +461,32 @@ const styles = {
         fontSize: "1rem",
         color: "#334155",
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    },
+    twoColumnRow: {
+        display: "flex",
+        gap: "24px",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        flexWrap: "nowrap",
+    },
+    leftPanel: {
+        flex: 3,
+        backgroundColor: "#fff",
+        borderRadius: "10px",
+        padding: "20px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        boxSizing: "border-box",
+        color: "#1e293b",
+    },
+    rightPanel: {
+        flex: 2,
+        backgroundColor: "#fff",
+        borderRadius: "10px",
+        padding: "20px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        boxSizing: "border-box",
+        color: "#1e293b",
+        minWidth: "250px",
     },
 };
 
