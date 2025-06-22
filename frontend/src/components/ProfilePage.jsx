@@ -339,7 +339,7 @@ const ProfilePage = () => {
 const styles = {
     pageWrapper: {
         minHeight: "100vh",
-        backgroundColor: "#3b82f6",
+        backgroundColor: "#0077cc",
         padding: "40px 20px",
         width: "100vw",
         boxSizing: "border-box",
