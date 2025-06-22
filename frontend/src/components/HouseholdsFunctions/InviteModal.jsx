@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const InviteModal = ({ householdId, onClose }) => {
     const [email, setEmail] = useState("");
@@ -8,7 +9,7 @@ const InviteModal = ({ householdId, onClose }) => {
 
     const handleSendInvite = async () => {
         if (!email.trim()) {
-            setMessage("Email jest wymagany");
+            setMessage("Email is required.");
             return;
         }
 
@@ -30,10 +31,10 @@ const InviteModal = ({ householdId, onClose }) => {
             if (response.ok) {
                 setToken(data.token);
             } else {
-                setMessage(`Błąd: ${data.message}`);
+                toast.error(`Error: ${data.message}`);
             }
         } catch (error) {
-            setMessage(`Błąd sieci: ${error.message}`);
+            toast.error(`Error: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -42,115 +43,169 @@ const InviteModal = ({ householdId, onClose }) => {
     const handleCopy = () => {
         if (token) {
             navigator.clipboard.writeText(token);
-            setMessage("Skopiowano do schowka!");
+            setMessage("Copied to clipboard!");
         }
     };
 
     return (
         <div style={styles.modal}>
             <div style={styles.modalContent}>
-                <h3>Wygeneruj zaproszenie</h3>
+                <h3 style={styles.title}>Generate invitation</h3>
                 {!token ? (
                     <>
                         <input
                             type="email"
-                            placeholder="Podaj email zapraszanej osoby"
+                            placeholder="Provide the email of the person you are inviting"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             style={styles.input}
                             disabled={loading}
                         />
-                        <div style={{ marginTop: 10 }}>
+                        <div style={styles.buttonGroup}>
                             <button
                                 onClick={handleSendInvite}
                                 disabled={loading}
                                 style={styles.okButton}
                             >
-                                {loading
-                                    ? "Wysyłanie..."
-                                    : "Wyślij zaproszenie"}
+                                {loading ? "Sending..." : "Send an invitation"}
                             </button>
                             <button
                                 onClick={onClose}
                                 disabled={loading}
                                 style={styles.cancelButton}
                             >
-                                Anuluj
+                                Cancel
                             </button>
                         </div>
                     </>
                 ) : (
                     <>
-                        <p>Zaproszenie wygenerowane!</p>
+                        <p style={styles.successMessage}>
+                            Invitation generated!
+                        </p>
                         <textarea
                             readOnly
                             value={token}
-                            style={{ width: "100%", height: 80, marginTop: 10 }}
+                            style={styles.textarea}
                         />
-                        <div style={{ marginTop: 10 }}>
+                        <div style={styles.buttonGroup}>
                             <button
                                 onClick={handleCopy}
                                 style={styles.okButton}
                             >
-                                Kopiuj token
+                                Copy token
                             </button>
                             <button
                                 onClick={onClose}
                                 style={styles.cancelButton}
                             >
-                                Zamknij
+                                Close
                             </button>
                         </div>
                     </>
                 )}
-                {message && <p style={{ marginTop: 10 }}>{message}</p>}
+                {message && <p style={styles.message}>{message}</p>}
             </div>
         </div>
     );
 };
-
 const styles = {
     modal: {
         position: "fixed",
         top: 0,
         left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0,0,0,0.4)",
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: "center",
         zIndex: 1000,
+        padding: "15px",
+        boxSizing: "border-box",
     },
     modalContent: {
         backgroundColor: "#fff",
-        padding: 20,
-        borderRadius: 8,
-        boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-        minWidth: 320,
+        padding: "30px 25px",
+        borderRadius: "12px",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+        width: "100%",
+        maxWidth: "420px",
+        display: "flex",
+        flexDirection: "column",
+    },
+    title: {
+        marginBottom: "20px",
+        fontSize: "24px",
+        fontWeight: "600",
+        color: "#222",
         textAlign: "center",
     },
     input: {
+        padding: "12px 15px",
+        fontSize: "16px",
+        borderRadius: "8px",
+        border: "1.5px solid #ccc",
+        outline: "none",
+        transition: "border-color 0.3s",
         width: "100%",
-        padding: 8,
-        marginTop: 10,
-        fontSize: 16,
+        boxSizing: "border-box",
+    },
+    textarea: {
+        width: "100%",
+        height: "80px",
+        padding: "12px 15px",
+        fontSize: "14px",
+        borderRadius: "8px",
+        border: "1.5px solid #ccc",
+        resize: "none",
+        boxSizing: "border-box",
+        marginTop: "10px",
+        fontFamily: "monospace",
+        backgroundColor: "#f9f9f9",
+        color: "#333",
+    },
+    buttonGroup: {
+        marginTop: "15px",
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "12px",
     },
     okButton: {
-        marginRight: 10,
-        padding: "8px 16px",
+        flex: 1,
+        padding: "12px 0",
         backgroundColor: "#007bff",
-        color: "white",
         border: "none",
-        borderRadius: 4,
+        borderRadius: "8px",
+        color: "white",
+        fontWeight: "600",
         cursor: "pointer",
+        transition: "background-color 0.3s",
     },
     cancelButton: {
-        padding: "8px 16px",
-        backgroundColor: "#ccc",
+        flex: 1,
+        padding: "12px 0",
+        backgroundColor: "#f1f1f1",
         border: "none",
-        borderRadius: 4,
+        borderRadius: "8px",
+        color: "#555",
+        fontWeight: "600",
         cursor: "pointer",
+        transition: "background-color 0.3s",
+    },
+    message: {
+        marginTop: "15px",
+        textAlign: "center",
+        color: "#d9534f",
+        fontWeight: "500",
+        fontSize: "14px",
+    },
+    successMessage: {
+        fontWeight: "600",
+        fontSize: "16px",
+        color: "#28a745",
+        textAlign: "center",
+        marginBottom: "10px",
     },
 };
 

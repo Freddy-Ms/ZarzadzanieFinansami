@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const JoinHouseholdPanel = ({ showModal, setShowModal, onSuccess }) => {
     const [tokenInput, setTokenInput] = useState("");
@@ -6,25 +8,28 @@ const JoinHouseholdPanel = ({ showModal, setShowModal, onSuccess }) => {
 
     const joinHousehold = async (token) => {
         try {
-            const response = await fetch("http://127.0.0.1:5000/household/accept_invite", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token }),
-            });
+            const response = await fetch(
+                "http://127.0.0.1:5000/household/accept_invite",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ token }),
+                }
+            );
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Błąd podczas dołączania do householda");
+                throw new Error(data.message);
             }
 
-            setMessage("Dołączono pomyślnie!");
+            toast.success("Joined successfully!");
             return true;
         } catch (err) {
-            setMessage("Błąd: " + err.message);
+            toast.error("Error: " + err.message);
             return false;
         }
     };
@@ -32,81 +37,118 @@ const JoinHouseholdPanel = ({ showModal, setShowModal, onSuccess }) => {
     const handleConfirm = async () => {
         if (tokenInput.trim()) {
             const success = await joinHousehold(tokenInput.trim());
-            if(success) {
-                onSuccess?.();          // odświeżenie po sukcesie
-                setShowModal(false);    // zamknięcie modala
+            if (success) {
+                onSuccess?.(); // odświeżenie po sukcesie
+                setShowModal(false); // zamknięcie modala
                 setTokenInput("");
                 setMessage("");
             }
         } else {
-            setMessage("Wklej token zaproszenia.");
+            setMessage("Paste the invitation token.");
         }
     };
 
     if (!showModal) return null;
-
     return (
         <div style={styles.modal}>
             <div style={styles.modalContent}>
-                <h3>Wklej token zaproszenia</h3>
+                <h3 style={styles.title}>Paste invitation token</h3>
                 <input
                     type="text"
                     value={tokenInput}
                     onChange={(e) => setTokenInput(e.target.value)}
                     style={styles.input}
+                    placeholder="Enter token here"
                 />
-                <div style={{ marginTop: "10px" }}>
+                <div style={styles.buttonGroup}>
                     <button onClick={handleConfirm} style={styles.okButton}>
-                        OK
+                        Ok
                     </button>
-                    <button onClick={() => setShowModal(false)} style={styles.cancelButton}>
-                        Anuluj
+                    <button
+                        onClick={() => setShowModal(false)}
+                        style={styles.cancelButton}
+                    >
+                        Cancel
                     </button>
                 </div>
-                {message && <p>{message}</p>}
+                {message && <p style={styles.message}>{message}</p>}
             </div>
         </div>
     );
 };
-
 const styles = {
     modal: {
         position: "fixed",
-        top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0,0,0,0.4)",
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: "center",
         zIndex: 1000,
     },
     modalContent: {
         backgroundColor: "#fff",
-        padding: "20px",
-        borderRadius: "8px",
-        boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-        minWidth: "300px",
+        padding: "30px 25px",
+        borderRadius: "12px",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+        width: "90%",
+        maxWidth: "380px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+    },
+    title: {
+        marginBottom: "20px",
+        fontSize: "22px",
+        fontWeight: "600",
+        color: "#222",
         textAlign: "center",
     },
     input: {
-        width: "100%",
-        padding: "8px",
-        marginTop: "10px",
+        padding: "12px 15px",
+        fontSize: "16px",
+        borderRadius: "8px",
+        border: "1.5px solid #ccc",
+        outline: "none",
+        transition: "border-color 0.3s",
+        marginBottom: "20px",
+    },
+    buttonGroup: {
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "12px",
     },
     okButton: {
-        marginRight: "10px",
-        padding: "8px 16px",
+        flex: 1,
+        padding: "12px 0",
         backgroundColor: "#007bff",
-        color: "#fff",
         border: "none",
-        borderRadius: "4px",
+        borderRadius: "8px",
+        color: "white",
+        fontWeight: "600",
         cursor: "pointer",
+        transition: "background-color 0.3s",
     },
     cancelButton: {
-        padding: "8px 16px",
-        backgroundColor: "#ccc",
+        flex: 1,
+        padding: "12px 0",
+        backgroundColor: "#f1f1f1",
         border: "none",
-        borderRadius: "4px",
+        borderRadius: "8px",
+        color: "#555",
+        fontWeight: "600",
         cursor: "pointer",
+        transition: "background-color 0.3s",
+    },
+    message: {
+        marginTop: "15px",
+        textAlign: "center",
+        color: "#d9534f",
+        fontWeight: "500",
+        fontSize: "14px",
     },
 };
 

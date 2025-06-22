@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import JoinHouseholdPanel from "./HouseholdsFunctions/JoinHouseholdPanel";
 import InviteModal from "./HouseholdsFunctions/InviteModal";
 import AddHouseholdModal from "./HouseholdsFunctions/AddHouseholdModal";
@@ -7,7 +9,7 @@ import AddHouseholdModal from "./HouseholdsFunctions/AddHouseholdModal";
 const HouseholdPage = () => {
     const navigate = useNavigate();
     const [household, setHousehold] = useState([]);
-    const [error, setError] = useState(null);
+    const [, setError] = useState(null);
     const [username, setUsername] = useState(null);
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [showInvite, setShowInvite] = useState(false);
@@ -26,16 +28,21 @@ const HouseholdPage = () => {
                 }
             );
 
+            if (response.status === 404) {
+                setHousehold([]);
+                return;
+            }
+
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Błąd pobierania householdów");
+                throw new Error(data.message);
             }
 
             setHousehold(data);
             setError(null);
         } catch (err) {
-            console.error("Błąd:", err.message);
+            console.error("Error:", err.message);
             setError(err.message);
         }
     };
@@ -86,27 +93,114 @@ const HouseholdPage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(
-                    data.message || "Błąd podczas edycji household"
-                );
+                throw new Error(data.message);
             }
 
             setShowEditModal(false);
             setEditHouseholdId(null);
             setEditHouseholdName("");
             await fetchUserHouseholds();
-            alert("Household zaktualizowany pomyślnie");
+            toast.success("Household successfully updated!", {
+                autoClose: 3000,
+            });
         } catch (err) {
-            alert("Błąd edycji household: " + err.message);
+            toast.error("Error: " + err.message, {
+                autoClose: 3000,
+            });
         }
     };
 
-    const handleDeleteHousehold = (id) => {
-        alert(`Usuń household ID ${id}`);
+    const handleDeleteHousehold = async (id) => {
+        if (
+            !window.confirm(`Are you sure you want to delete your household?`)
+        ) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/household/delete",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ household_id: id }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                toast.error(data.message, { autoClose: 3000 });
+                return;
+            }
+
+            await fetchUserHouseholds();
+            toast.success(data.message, { autoClose: 3000 });
+        } catch (error) {
+            toast.error("Error: " + error.message, { autoClose: 3000 });
+        }
     };
 
-    const handleLeave = (id) => {
-        alert(`Opuść household ID ${id}`);
+    const handleLeave = async (householdId) => {
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/household/leave",
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ household_id: householdId }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.success(data.message);
+                fetchUserHouseholds();
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error("Error: " + error.message);
+        }
+    };
+
+    const handleRemoveMember = async (householdId, usernameToKick) => {
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/household/kick",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        household_id: householdId,
+                        username_to_kick: usernameToKick,
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                toast.error(errorData.message);
+                return;
+            }
+
+            const data = await response.json();
+            toast.success(data.message);
+
+            fetchUserHouseholds();
+        } catch (error) {
+            toast.error("Error: " + error.message);
+        }
     };
 
     useEffect(() => {
@@ -128,6 +222,7 @@ const HouseholdPage = () => {
 
     return (
         <div style={styles.pageWrapper}>
+            <ToastContainer position="top-center" autoClose={3000} />
             <div style={styles.outerContainer}>
                 <button
                     style={styles.backButton}
@@ -141,24 +236,62 @@ const HouseholdPage = () => {
                             styles.backButton.backgroundColor)
                     }
                 >
-                    ← Wróć
+                    ← Back
                 </button>
 
                 <div style={styles.twoColumnRow}>
                     <div style={styles.panel}>
-                        <h2 style={styles.title}>Twoje householdy</h2>
+                        <h2 style={styles.title}>Your household</h2>
                         {myHouseholds.length > 0 ? (
                             myHouseholds.map((h, index) => (
                                 <div key={index} style={styles.householdCard}>
                                     <p>
-                                        <strong>Nazwa:</strong> {h.name}
+                                        <strong>Name:</strong> {h.name}
                                     </p>
-                                    <p>
-                                        <strong>Członkowie:</strong>{" "}
-                                        {h.members.length > 0
-                                            ? h.members.join(", ")
-                                            : "Brak innych członków"}
-                                    </p>
+                                    <div>
+                                        <strong>Members:</strong>
+                                        {h.members.length > 0 ? (
+                                            h.members.map((member, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                            "space-between",
+                                                        alignItems: "center",
+                                                        padding: "6px 10px",
+                                                        margin: "4px 0",
+                                                        backgroundColor:
+                                                            "#f0f0f0",
+                                                        borderRadius: "4px",
+                                                    }}
+                                                >
+                                                    <span>{member}</span>
+                                                    <button
+                                                        style={{
+                                                            backgroundColor:
+                                                                "#e74c3c",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "3px",
+                                                            padding: "4px 8px",
+                                                            cursor: "pointer",
+                                                        }}
+                                                        onClick={() =>
+                                                            handleRemoveMember(
+                                                                h.id,
+                                                                member
+                                                            )
+                                                        }
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p>No other members</p>
+                                        )}
+                                    </div>
 
                                     <div style={styles.buttonRow}>
                                         <>
@@ -166,8 +299,16 @@ const HouseholdPage = () => {
                                                 onClick={() =>
                                                     setShowInvite(true)
                                                 }
+                                                style={{
+                                                    backgroundColor: "#3B82F6",
+                                                    color: "white",
+                                                    padding: "0.5rem 1rem",
+                                                    borderRadius: "0.5rem",
+                                                    border: "none",
+                                                    cursor: "pointer",
+                                                }}
                                             >
-                                                Wygeneruj zaproszenie
+                                                Generate invitation
                                             </button>
                                             {showInvite && (
                                                 <InviteModal
@@ -183,7 +324,7 @@ const HouseholdPage = () => {
                                             style={styles.warningButton}
                                             onClick={() => handleEdit(h.id)}
                                         >
-                                            Edytuj
+                                            Edit
                                         </button>
                                         <button
                                             style={styles.dangerButton}
@@ -191,14 +332,14 @@ const HouseholdPage = () => {
                                                 handleDeleteHousehold(h.id)
                                             }
                                         >
-                                            Usuń household
+                                            Delete household
                                         </button>
                                     </div>
 
                                     {showEditModal && (
                                         <div style={modalStyles.overlay}>
                                             <div style={modalStyles.modal}>
-                                                <h3>Edytuj household</h3>
+                                                <h3>Edit household</h3>
                                                 <input
                                                     type="text"
                                                     value={editHouseholdName}
@@ -208,7 +349,7 @@ const HouseholdPage = () => {
                                                         )
                                                     }
                                                     style={modalStyles.input}
-                                                    placeholder="Nowa nazwa household"
+                                                    placeholder="New household name"
                                                 />
                                                 <div
                                                     style={
@@ -223,7 +364,7 @@ const HouseholdPage = () => {
                                                             styles.primaryButton
                                                         }
                                                     >
-                                                        Zapisz
+                                                        Save
                                                     </button>
                                                     <button
                                                         onClick={() =>
@@ -235,7 +376,7 @@ const HouseholdPage = () => {
                                                             styles.dangerButton
                                                         }
                                                     >
-                                                        Anuluj
+                                                        Cancel
                                                     </button>
                                                 </div>
                                             </div>
@@ -245,11 +386,19 @@ const HouseholdPage = () => {
                             ))
                         ) : (
                             <>
-                                <p>Nie masz jeszcze householda.</p>
+                                <p>You don't have a household yet</p>
                                 <button
                                     onClick={() => setAddModalVisible(true)}
+                                    style={{
+                                        backgroundColor: "#3B82F6",
+                                        color: "white",
+                                        padding: "0.5rem 1rem",
+                                        borderRadius: "0.5rem",
+                                        border: "none",
+                                        cursor: "pointer",
+                                    }}
                                 >
-                                    Dodaj household
+                                    Add household
                                 </button>
 
                                 <AddHouseholdModal
@@ -269,9 +418,19 @@ const HouseholdPage = () => {
                                 alignItems: "center",
                             }}
                         >
-                            <h2 style={styles.title}>Pozostałe householdy</h2>
-                            <button onClick={() => setShowJoinModal(true)}>
-                                Dołącz do householda
+                            <h2 style={styles.title}>Other households</h2>
+                            <button
+                                onClick={() => setShowJoinModal(true)}
+                                style={{
+                                    backgroundColor: "#3B82F6",
+                                    color: "white",
+                                    padding: "0.5rem 1rem",
+                                    borderRadius: "0.5rem",
+                                    border: "none",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Join a household
                             </button>
 
                             <JoinHouseholdPanel
@@ -284,17 +443,17 @@ const HouseholdPage = () => {
                             otherHouseholds.map((h, index) => (
                                 <div key={index} style={styles.householdCard}>
                                     <p>
-                                        <strong>Nazwa:</strong> {h.name}
+                                        <strong>Name:</strong> {h.name}
                                     </p>
                                     <p>
-                                        <strong>Właściciel:</strong>{" "}
+                                        <strong>Owner:</strong>{" "}
                                         {h.owner_username}
                                     </p>
                                     <p>
-                                        <strong>Członkowie:</strong>{" "}
+                                        <strong>Members:</strong>{" "}
                                         {h.members.length > 0
                                             ? h.members.join(", ")
-                                            : "Brak innych członków"}
+                                            : "No other members"}
                                     </p>
 
                                     <div style={styles.buttonRow}>
@@ -302,13 +461,13 @@ const HouseholdPage = () => {
                                             style={styles.leaveButton}
                                             onClick={() => handleLeave(h.id)}
                                         >
-                                            Opuść household
+                                            Leave household
                                         </button>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <p>Nie należysz do innych householdów.</p>
+                            <p>You don't belong to other households.</p>
                         )}
                     </div>
                 </div>
@@ -317,7 +476,6 @@ const HouseholdPage = () => {
     );
 };
 
-// Style
 const styles = {
     pageWrapper: {
         minHeight: "100vh",
@@ -463,7 +621,10 @@ const styles = {
 const modalStyles = {
     overlay: {
         position: "fixed",
-        top: 0, left: 0, right: 0, bottom: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         backgroundColor: "rgba(0,0,0,0.5)",
         display: "flex",
         justifyContent: "center",
@@ -495,6 +656,5 @@ const modalStyles = {
         gap: "10px",
     },
 };
-
 
 export default HouseholdPage;
