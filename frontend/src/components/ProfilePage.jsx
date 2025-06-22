@@ -7,33 +7,59 @@ const ProfilePage = () => {
     const [error, setError] = useState(null);
     const [username, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [household, setHousehold] = useState("");
+    const [household, setHousehold] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await fetch("http://127.0.0.1:5000/user/get", {
-                    method: "GET",
-                    credentials: "include",
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.message || "Błąd pobierania danych");
-                }
-
-                setUser(data);
-                setName(data.username);
-                setEmail(data.email);
-                setHousehold(data.household || "");
-            } catch (err) {
-                setError(err.message);
-            }
+        const getHouseholds = async () => {
+            const data = await fetchUserHouseholds();
+            setHousehold(data);
         };
-
+        getHouseholds();
         fetchUser();
     }, []);
+
+    const fetchUser = async () => {
+        try {
+            const response = await fetch("http://127.0.0.1:5000/user/get", {
+                method: "GET",
+                credentials: "include",
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || "Error downloading data");
+            }
+
+            setUser(data);
+            setName(data.username);
+            setEmail(data.email);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const fetchUserHouseholds = async () => {
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/household/get",
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Błąd pobierania householdów");
+            }
+            return data;
+        } catch (err) {
+            console.error("Błąd:", err.message);
+            return null;
+        }
+    };
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -63,10 +89,10 @@ const ProfilePage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Błąd podczas zapisu danych");
+                throw new Error(data.message || "Error while writing data");
             }
 
-            alert(data.message || "Profil zaktualizowany pomyślnie");
+            alert(data.message || "Profile updated successfully");
 
             setUser((prev) => ({ ...prev, username: username, email: email }));
             setIsEditing(false);
@@ -76,10 +102,11 @@ const ProfilePage = () => {
     };
 
     const handleDelete = async () => {
-        if (!window.confirm("Czy na pewno chcesz usunąć konto?")) return;
+        if (!window.confirm("Are you sure you want to delete your account?"))
+            return;
 
         try {
-            const response = await fetch("http://localhost:5000/user/delete", {
+            const response = await fetch("http://127.0.0.1:5000/user/delete", {
                 method: "POST",
                 credentials: "include",
             });
@@ -87,10 +114,10 @@ const ProfilePage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Błąd podczas usuwania konta");
+                throw new Error(data.message || "Error deleting account");
             }
 
-            alert(data.message || "Konto usunięte pomyślnie");
+            alert(data.message || "Account deleted successfully");
 
             navigate("/");
         } catch (err) {
@@ -98,163 +125,201 @@ const ProfilePage = () => {
         }
     };
 
-    const handleJoinHousehold = () => alert("Dołącz do householda");
-
-    // Obsługa przycisków householda
-    const handleAdd = () => alert("Dodaj do householda");
-    const handleEditHousehold = () => alert("Edytuj household");
-    const handleRemove = () => alert("Usuń z householda");
-    const handleGenerateInvite = () => alert("Wygeneruj zaproszenie");
-    const handleLeave = () => alert("Opuść household");
-    const handleKick = () => alert("Wyrzuć kogoś z householda");
-
     return (
         <div style={styles.pageWrapper}>
-            <div style={styles.container}>
-                <div style={styles.panel}>
+            <div style={styles.outerContainer}>
+                <div style={styles.topRow}>
                     <button
                         style={styles.backButton}
                         onClick={() => navigate("/homepage")}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                                styles.hoverEffects.backButtonHover.backgroundColor)
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                                styles.backButton.backgroundColor)
+                        }
                     >
-                        ← Wróć
+                        ← Back
                     </button>
 
-                    <h2 style={styles.title}>Profil użytkownika</h2>
+                    <div style={styles.panel}>
+                        <h2 style={styles.title}>User Profile</h2>
 
-                    {error && <p style={{ color: "red" }}>{error}</p>}
+                        {error && (
+                            <p style={{ color: "#f87171", marginBottom: 10 }}>
+                                {error}
+                            </p>
+                        )}
 
-                    {user ? (
-                        <div style={styles.infoBox}>
-                            {isEditing ? (
-                                <>
-                                    <label>
-                                        Nazwa:
-                                        <br />
-                                        <input
-                                            type="text"
-                                            value={username}
-                                            onChange={(e) =>
-                                                setName(e.target.value)
-                                            }
-                                            style={styles.input}
-                                        />
-                                    </label>
-                                    <br />
-                                    <label>
-                                        Email:
-                                        <br />
-                                        <input
-                                            type="email"
-                                            value={email}
-                                            onChange={(e) =>
-                                                setEmail(e.target.value)
-                                            }
-                                            style={styles.input}
-                                        />
-                                    </label>
-                                    <br />
-                                    <p>
-                                        <strong>Household:</strong>{" "}
-                                        {household ||
-                                            "Brak przypisanego householda"}
-                                    </p>
-                                    <br />
-                                    <button
-                                        style={styles.saveButton}
-                                        onClick={handleSave}
-                                    >
-                                        Zapisz
-                                    </button>
-                                    <button
-                                        style={styles.cancelButton}
-                                        onClick={handleCancel}
-                                    >
-                                        Anuluj
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <p>
-                                        <strong>Nazwa:</strong> {user.username}
-                                    </p>
-                                    <p>
-                                        <strong>Email:</strong> {user.email}
-                                    </p>
-                                    <p>
-                                        <strong>Household:</strong>{" "}
-                                        {user.household ||
-                                            "Brak przypisanego householda"}
-                                    </p>
-                                </>
-                            )}
+                        {user ? (
+                            <div style={styles.infoBox}>
+                                {isEditing ? (
+                                    <>
+                                        <label style={styles.label}>
+                                            Name:
+                                            <input
+                                                type="text"
+                                                value={username}
+                                                onChange={(e) =>
+                                                    setName(e.target.value)
+                                                }
+                                                style={styles.input}
+                                                placeholder="Enter your name"
+                                                onFocus={(e) =>
+                                                    (e.currentTarget.style.borderColor =
+                                                        styles.inputFocus.borderColor)
+                                                }
+                                                onBlur={(e) =>
+                                                    (e.currentTarget.style.borderColor =
+                                                        styles.input.borderColor)
+                                                }
+                                            />
+                                        </label>
+                                        <label style={styles.label}>
+                                            Email:
+                                            <input
+                                                type="email"
+                                                value={email}
+                                                onChange={(e) =>
+                                                    setEmail(e.target.value)
+                                                }
+                                                style={styles.input}
+                                                placeholder="Enter your email"
+                                                onFocus={(e) =>
+                                                    (e.currentTarget.style.borderColor =
+                                                        styles.inputFocus.borderColor)
+                                                }
+                                                onBlur={(e) =>
+                                                    (e.currentTarget.style.borderColor =
+                                                        styles.input.borderColor)
+                                                }
+                                            />
+                                        </label>
+                                        <p>
+                                            <strong>Household:</strong>{" "}
+                                            {household && household.length > 0
+                                                ? household
+                                                      .map((h) => h.name)
+                                                      .join(", ")
+                                                : "No household assigned"}
+                                        </p>
+
+                                        <div style={styles.buttonRow}>
+                                            <button
+                                                style={styles.saveButton}
+                                                onMouseEnter={(e) =>
+                                                    (e.currentTarget.style.backgroundColor =
+                                                        styles.hoverEffects.saveButtonHover.backgroundColor)
+                                                }
+                                                onMouseLeave={(e) =>
+                                                    (e.currentTarget.style.backgroundColor =
+                                                        styles.saveButton.backgroundColor)
+                                                }
+                                                onClick={handleSave}
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                style={styles.cancelButton}
+                                                onMouseEnter={(e) =>
+                                                    (e.currentTarget.style.backgroundColor =
+                                                        styles.hoverEffects.cancelButtonHover.backgroundColor)
+                                                }
+                                                onMouseLeave={(e) =>
+                                                    (e.currentTarget.style.backgroundColor =
+                                                        styles.cancelButton.backgroundColor)
+                                                }
+                                                onClick={handleCancel}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p>
+                                            <strong>Name:</strong>{" "}
+                                            {user.username}
+                                        </p>
+                                        <p>
+                                            <strong>Email:</strong> {user.email}
+                                        </p>
+                                        <p>
+                                            <strong>Household:</strong>{" "}
+                                            {household && household.length > 0
+                                                ? household
+                                                      .map((h) => h.name)
+                                                      .join(", ")
+                                                : "No household assigned"}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        ) : (
+                            !error && <p>Loading data...</p>
+                        )}
+
+                        <div style={styles.buttonsRow}>
+                            <button
+                                style={{
+                                    ...styles.button,
+                                    ...styles.editButton,
+                                }}
+                                onMouseEnter={(e) =>
+                                    (e.currentTarget.style.backgroundColor =
+                                        styles.hoverEffects.editButtonHover.backgroundColor)
+                                }
+                                onMouseLeave={(e) =>
+                                    (e.currentTarget.style.backgroundColor =
+                                        styles.editButton.backgroundColor)
+                                }
+                                onClick={handleEditClick}
+                            >
+                                Edit Account
+                            </button>
+                            <button
+                                style={{
+                                    ...styles.button,
+                                    ...styles.deleteButton,
+                                }}
+                                onMouseEnter={(e) =>
+                                    (e.currentTarget.style.backgroundColor =
+                                        styles.hoverEffects.deleteButtonHover.backgroundColor)
+                                }
+                                onMouseLeave={(e) =>
+                                    (e.currentTarget.style.backgroundColor =
+                                        styles.deleteButton.backgroundColor)
+                                }
+                                onClick={handleDelete}
+                            >
+                                Delete Account
+                            </button>
                         </div>
-                    ) : (
-                        !error && <p>Ładowanie danych...</p>
-                    )}
-
-                    <div style={styles.buttonsRow}>
-                        <button
-                            style={{ ...styles.button, ...styles.editButton }}
-                            onClick={handleEditClick}
-                        >
-                            Edytuj konto
-                        </button>
-                        <button
-                            style={{ ...styles.button, ...styles.deleteButton }}
-                            onClick={handleDelete}
-                        >
-                            Usuń konto
-                        </button>
                     </div>
-                </div>
 
-                {/* Panel Household */}
-                <div style={styles.panel}>
-                    <h2 style={styles.title}>Household</h2>
-
-                    <div style={styles.householdButtons}>
-                        <button
-                            style={styles.householdButton}
-                            onClick={handleAdd}
-                        >
-                            Dodaj
-                        </button>
-                        <button
-                            style={styles.householdButton}
-                            onClick={handleEditHousehold}
-                        >
-                            Edytuj
-                        </button>
-                        <button
-                            style={styles.householdButton}
-                            onClick={handleRemove}
-                        >
-                            Usuń
-                        </button>
-                        <button
-                            style={styles.householdButton}
-                            onClick={handleGenerateInvite}
-                        >
-                            Wygeneruj zaproszenie
-                        </button>
-                        <button
-                            style={styles.householdButton}
-                            onClick={handleLeave}
-                        >
-                            Opuść
-                        </button>
-                        <button
-                            style={styles.householdButton}
-                            onClick={handleKick}
-                        >
-                            Wywal kogoś
-                        </button>
-                        <button
-                            style={styles.householdButton}
-                            onClick={handleJoinHousehold}
-                        >
-                            Dołącz
-                        </button>
+                    {/* Household Panel */}
+                    <div style={styles.fullWidthPanel}>
+                        <h2 style={styles.title}>Households You Belong To</h2>
+                        {household.length > 0 ? (
+                            <ul
+                                style={{
+                                    listStyle: "none",
+                                    padding: 0,
+                                    margin: 0,
+                                }}
+                            >
+                                {household.map((h, i) => (
+                                    <li key={i} style={styles.householdBox}>
+                                        <strong>{h.name}</strong> – owner:{" "}
+                                        {h.owner_username}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>You do not belong to any households.</p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -264,79 +329,158 @@ const ProfilePage = () => {
 
 const styles = {
     pageWrapper: {
-        height: "100vh",
-        backgroundColor: "#3b82f6",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        minHeight: "100vh",
+        backgroundColor: "#3b82f6",  // intensywny niebieski
+        padding: "40px 20px",
         width: "100vw",
+        boxSizing: "border-box",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        color: "#1e293b", // ciemny tekst na jasnym tle, tu trochę ciemny tekst na tle przycisków
     },
-    container: {
+
+    outerContainer: {
         display: "flex",
-        gap: 40,
+        flexDirection: "column",
+        gap: "24px",
+        width: "100%",
+        maxWidth: "1200px",
+        margin: "0 auto",
     },
+
+    topRow: {
+        display: "flex",
+        gap: "24px",
+        flexWrap: "nowrap",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+    },
+
     panel: {
-        backgroundColor: "#f9fafb",
-        padding: 20,
-        borderRadius: 8,
-        width: 360,
-        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+        backgroundColor: "#fff",  // jasne tło paneli
+        borderRadius: "12px",
+        padding: "24px",
+        flex: "1 1 48%",
+        boxShadow: "0 6px 12px rgba(0,0,0,0.08)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        color: "#1e293b", // ciemny tekst
     },
-    backButton: {
-        background: "none",
-        border: "none",
-        color: "#3b82f6",
-        fontSize: 16,
-        cursor: "pointer",
-        marginBottom: 20,
+
+    fullWidthPanel: {
+        backgroundColor: "#fff",  // jasne tło
+        borderRadius: "12px",
+        padding: "24px",
+        boxShadow: "0 6px 12px rgba(0,0,0,0.08)",
+        marginTop: "16px",
+        color: "#1e293b",
     },
+
     title: {
-        textAlign: "center",
-        color: "#111827",
-        marginBottom: 20,
+        marginBottom: "16px",
+        fontSize: "1.75rem",
+        fontWeight: "600",
+        color: "#1e293b",
     },
+
     infoBox: {
-        backgroundColor: "#ffffff",
-        padding: 20,
-        borderRadius: 8,
-        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        marginBottom: 30,
-        color: "#111827",
+        backgroundColor: "#f9fafb",  // jasne, delikatne tło
+        padding: "16px",
+        borderRadius: "8px",
+        marginBottom: "16px",
+        boxShadow: "inset 0 0 8px rgba(0,0,0,0.05)",
+        color: "#1e293b",
     },
+
+    label: {
+        display: "block",
+        marginBottom: "12px",
+        fontWeight: "500",
+        fontSize: "1rem",
+        color: "#334155",
+    },
+
     input: {
         width: "100%",
-        padding: 8,
-        fontSize: 16,
-        marginTop: 4,
-        marginBottom: 12,
-        borderRadius: 4,
-        border: "1px solid #ccc",
+        padding: "10px 12px",
+        borderRadius: "6px",
+        border: "1.5px solid #cbd5e1",
+        fontSize: "1rem",
+        transition: "border-color 0.2s ease",
+        color: "#1e293b",
+        backgroundColor: "#fff",
     },
-    editButton: {
-        backgroundColor: "#3b82f6",
+
+    buttonRow: {
+        display: "flex",
+        gap: "14px",
+        marginTop: "14px",
+        flexWrap: "wrap",
+    },
+
+    buttonsRow: {
+        marginTop: "20px",
+        display: "flex",
+        gap: "14px",
+        flexWrap: "wrap",
+    },
+
+    button: {
+        padding: "12px 18px",
+        borderRadius: "8px",
         border: "none",
-        color: "white",
-        padding: "10px 16px",
-        borderRadius: 4,
         cursor: "pointer",
+        fontWeight: "600",
+        fontSize: "1rem",
+        transition: "background-color 0.3s ease",
+        userSelect: "none",
+        color: "#fff",  // biały tekst na kolorowych przyciskach
     },
+
+    editButton: {
+        backgroundColor: "#38bdf8",
+    },
+
+    deleteButton: {
+        backgroundColor: "#ef4444",
+    },
+
     saveButton: {
         backgroundColor: "#10b981",
-        border: "none",
-        color: "white",
-        padding: "10px 16px",
-        borderRadius: 4,
-        cursor: "pointer",
-        marginRight: 10,
+        padding: "12px 18px",
+        borderRadius: "8px",
     },
+
     cancelButton: {
-        backgroundColor: "#ef4444",
+        backgroundColor: "#94a3b8",
+        padding: "12px 18px",
+        borderRadius: "8px",
+    },
+
+    backButton: {
+        backgroundColor: "#58a7fc",
         border: "none",
-        color: "white",
-        padding: "10px 16px",
-        borderRadius: 4,
+        borderRadius: "8px",
+        padding: "8px 14px",
         cursor: "pointer",
+        marginBottom: "18px",
+        color: "#fff",
+        fontWeight: "600",
+        fontSize: "1rem",
+        alignSelf: "flex-start",
+        transition: "background-color 0.3s ease",
+    },
+
+    householdBox: {
+        backgroundColor: "#e2e8f0",
+        padding: "14px 20px",
+        borderRadius: "10px",
+        marginBottom: "14px",
+        fontSize: "1rem",
+        color: "#334155",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
     },
 };
+
 
 export default ProfilePage;
