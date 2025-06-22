@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import JoinHouseholdPanel from "./HouseholdsFunctions/JoinHouseholdPanel";
+import InviteModal from "./HouseholdsFunctions/InviteModal";
+import AddHouseholdModal from "./HouseholdsFunctions/AddHouseholdModal";
 
 const HouseholdPage = () => {
     const navigate = useNavigate();
     const [household, setHousehold] = useState([]);
     const [error, setError] = useState(null);
     const [username, setUsername] = useState(null);
+    const [showJoinModal, setShowJoinModal] = useState(false);
+    const [showInvite, setShowInvite] = useState(false);
+    const [addModalVisible, setAddModalVisible] = useState(false);
 
     const fetchUserHouseholds = async () => {
         try {
@@ -51,48 +57,8 @@ const HouseholdPage = () => {
         }
     };
 
-    const handleAdd = async () => {
-        const name = window.prompt("Podaj nazwę nowego householda:");
-
-        if (!name) {
-            alert("Nazwa householda nie może być pusta.");
-            return;
-        }
-
-        try {
-            const response = await fetch(
-                "http://127.0.0.1:5000/household/create",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({ name }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Nie udało się utworzyć householda"
-                );
-            }
-
-            alert(data.message || "Household utworzony pomyślnie");
-            fetchUserHouseholds();
-        } catch (err) {
-            alert("Błąd: " + err.message);
-        }
-    };
-
-    const handleInvite = (id) => {
-        alert(`Wygeneruj zaproszenie dla householda ID ${id}`);
-    };
-
-    const handleKick = (id) => {
-        alert(`Usuń członka z householda ID ${id}`);
+    const handleEdit = () => {
+        alert(`Edytuj household`);
     };
 
     const handleDeleteHousehold = (id) => {
@@ -148,10 +114,6 @@ const HouseholdPage = () => {
                                         <strong>Nazwa:</strong> {h.name}
                                     </p>
                                     <p>
-                                        <strong>Właściciel:</strong>{" "}
-                                        {h.owner_username}
-                                    </p>
-                                    <p>
                                         <strong>Członkowie:</strong>{" "}
                                         {h.members.length > 0
                                             ? h.members.join(", ")
@@ -159,17 +121,29 @@ const HouseholdPage = () => {
                                     </p>
 
                                     <div style={styles.buttonRow}>
-                                        <button
-                                            style={styles.primaryButton}
-                                            onClick={() => handleInvite(h.id)}
-                                        >
-                                            Wygeneruj zaproszenie
-                                        </button>
+                                        <>
+                                            <button
+                                                onClick={() =>
+                                                    setShowInvite(true)
+                                                }
+                                            >
+                                                Wygeneruj zaproszenie
+                                            </button>
+                                            {showInvite && (
+                                                <InviteModal
+                                                    householdId={h.id}
+                                                    onClose={() => {
+                                                        setShowInvite(false);
+                                                        fetchUserHouseholds();
+                                                    }}
+                                                />
+                                            )}
+                                        </>
                                         <button
                                             style={styles.warningButton}
-                                            onClick={() => handleKick(h.id)}
+                                            onClick={() => handleEdit(h.id)}
                                         >
-                                            Usuń członka
+                                            Edytuj
                                         </button>
                                         <button
                                             style={styles.dangerButton}
@@ -186,17 +160,39 @@ const HouseholdPage = () => {
                             <>
                                 <p>Nie masz jeszcze householda.</p>
                                 <button
-                                    style={styles.addButton}
-                                    onClick={handleAdd}
+                                    onClick={() => setAddModalVisible(true)}
                                 >
                                     Dodaj household
                                 </button>
+
+                                <AddHouseholdModal
+                                    visible={addModalVisible}
+                                    onClose={() => setAddModalVisible(false)}
+                                    onSuccess={fetchUserHouseholds}
+                                />
                             </>
                         )}
                     </div>
 
                     <div style={styles.panel}>
-                        <h2 style={styles.title}>Pozostałe householdy</h2>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                            }}
+                        >
+                            <h2 style={styles.title}>Pozostałe householdy</h2>
+                            <button onClick={() => setShowJoinModal(true)}>
+                                Dołącz do householda
+                            </button>
+
+                            <JoinHouseholdPanel
+                                showModal={showJoinModal}
+                                setShowModal={setShowJoinModal}
+                                onSuccess={fetchUserHouseholds}
+                            />
+                        </div>
                         {otherHouseholds.length > 0 ? (
                             otherHouseholds.map((h, index) => (
                                 <div key={index} style={styles.householdCard}>
@@ -296,14 +292,20 @@ const styles = {
         flexDirection: "column",
         justifyContent: "flex-start",
     },
-
     title: {
         marginBottom: "16px",
         fontSize: "1.75rem",
         fontWeight: "600",
         color: "#1e293b",
     },
-
+    joinButton: {
+        padding: "8px 16px",
+        backgroundColor: "#007bff",
+        color: "#fff",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+    },
     addButton: {
         marginTop: "12px",
         padding: "10px 16px",
@@ -372,47 +374,3 @@ const styles = {
 };
 
 export default HouseholdPage;
-
-/*
-const handleInvite = async (householdId) => { //działało poprawnie
-        const email = prompt("Podaj email zapraszanej osoby:");
-
-        if (!email) {
-            alert("Email jest wymagany");
-            return;
-        }
-
-        try {
-            const response = await fetch(
-                "http://127.0.0.1:5000/household/create_invite_token",
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ household_id: householdId, email }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert(`Zaproszenie wygenerowane! Token: ${data.token}`);
-            } else {
-                alert(`Błąd: ${data.message}`);
-            }
-        } catch (error) {
-            alert(`Błąd sieci: ${error.message}`);
-        }
-    };
-
-
-//const handleJoinHousehold = () => alert("Dołącz do householda");
-
-// Obsługa przycisków householda
-    const handleDeleteHousehold = () => alert("Usuń z householda");
-
-    const handleLeave = () => alert("Opuść household");
-    const handleKick = () => alert("Wyrzuć kogoś z householda");
-*/
