@@ -3,6 +3,7 @@ import StartPage from "./components/StartPage";
 import LoginRegisterPage from "./components/LoginRegisterPage";
 import HomePage from "./components/HomePage";
 import ProfilePage from "./components/ProfilePage";
+import HouseholdPage from "./components/HouseholdPage";
 
 function App() {
     return (
@@ -12,6 +13,7 @@ function App() {
                 <Route path="/login_register" element={<LoginRegisterPage />} />
                 <Route path="/homepage" element={<HomePage/>} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/household" element={<HouseholdPage />} />
             </Routes>
         </Router>
     );

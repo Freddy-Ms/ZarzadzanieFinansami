@@ -330,12 +330,12 @@ const ProfilePage = () => {
 const styles = {
     pageWrapper: {
         minHeight: "100vh",
-        backgroundColor: "#3b82f6",  // intensywny niebieski
+        backgroundColor: "#3b82f6",
         padding: "40px 20px",
         width: "100vw",
         boxSizing: "border-box",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        color: "#1e293b", // ciemny tekst na jasnym tle, tu trochę ciemny tekst na tle przycisków
+        color: "#1e293b", 
     },
 
     outerContainer: {
@@ -356,7 +356,7 @@ const styles = {
     },
 
     panel: {
-        backgroundColor: "#fff",  // jasne tło paneli
+        backgroundColor: "#fff",
         borderRadius: "12px",
         padding: "24px",
         flex: "1 1 48%",
@@ -364,11 +364,11 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        color: "#1e293b", // ciemny tekst
+        color: "#1e293b",
     },
 
     fullWidthPanel: {
-        backgroundColor: "#fff",  // jasne tło
+        backgroundColor: "#fff", 
         borderRadius: "12px",
         padding: "24px",
         boxShadow: "0 6px 12px rgba(0,0,0,0.08)",
@@ -384,7 +384,7 @@ const styles = {
     },
 
     infoBox: {
-        backgroundColor: "#f9fafb",  // jasne, delikatne tło
+        backgroundColor: "#f9fafb",
         padding: "16px",
         borderRadius: "8px",
         marginBottom: "16px",
@@ -434,7 +434,7 @@ const styles = {
         fontSize: "1rem",
         transition: "background-color 0.3s ease",
         userSelect: "none",
-        color: "#fff",  // biały tekst na kolorowych przyciskach
+        color: "#fff",
     },
 
     editButton: {
@@ -470,7 +470,11 @@ const styles = {
         alignSelf: "flex-start",
         transition: "background-color 0.3s ease",
     },
-
+    hoverEffects: {
+        backButtonHover: {
+            backgroundColor: "#1d4ed8",
+        },
+    },
     householdBox: {
         backgroundColor: "#e2e8f0",
         padding: "14px 20px",
@@ -481,6 +485,5 @@ const styles = {
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
     },
 };
-
 
 export default ProfilePage;
