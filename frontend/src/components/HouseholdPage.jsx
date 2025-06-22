@@ -12,6 +12,9 @@ const HouseholdPage = () => {
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [showInvite, setShowInvite] = useState(false);
     const [addModalVisible, setAddModalVisible] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editHouseholdId, setEditHouseholdId] = useState(null);
+    const [editHouseholdName, setEditHouseholdName] = useState("");
 
     const fetchUserHouseholds = async () => {
         try {
@@ -57,8 +60,45 @@ const HouseholdPage = () => {
         }
     };
 
-    const handleEdit = () => {
-        alert(`Edytuj household`);
+    const handleEdit = (householdId, currentName) => {
+        setEditHouseholdId(householdId);
+        setEditHouseholdName(currentName);
+        setShowEditModal(true);
+    };
+
+    const handleEditSubmit = async () => {
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/household/edit",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        household_id: editHouseholdId,
+                        name: editHouseholdName,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Błąd podczas edycji household"
+                );
+            }
+
+            setShowEditModal(false);
+            setEditHouseholdId(null);
+            setEditHouseholdName("");
+            await fetchUserHouseholds();
+            alert("Household zaktualizowany pomyślnie");
+        } catch (err) {
+            alert("Błąd edycji household: " + err.message);
+        }
     };
 
     const handleDeleteHousehold = (id) => {
@@ -154,6 +194,53 @@ const HouseholdPage = () => {
                                             Usuń household
                                         </button>
                                     </div>
+
+                                    {showEditModal && (
+                                        <div style={modalStyles.overlay}>
+                                            <div style={modalStyles.modal}>
+                                                <h3>Edytuj household</h3>
+                                                <input
+                                                    type="text"
+                                                    value={editHouseholdName}
+                                                    onChange={(e) =>
+                                                        setEditHouseholdName(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    style={modalStyles.input}
+                                                    placeholder="Nowa nazwa household"
+                                                />
+                                                <div
+                                                    style={
+                                                        modalStyles.buttonRow
+                                                    }
+                                                >
+                                                    <button
+                                                        onClick={
+                                                            handleEditSubmit
+                                                        }
+                                                        style={
+                                                            styles.primaryButton
+                                                        }
+                                                    >
+                                                        Zapisz
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            setShowEditModal(
+                                                                false
+                                                            )
+                                                        }
+                                                        style={
+                                                            styles.dangerButton
+                                                        }
+                                                    >
+                                                        Anuluj
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))
                         ) : (
@@ -372,5 +459,42 @@ const styles = {
         fontWeight: "600",
     },
 };
+
+const modalStyles = {
+    overlay: {
+        position: "fixed",
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+    },
+    modal: {
+        backgroundColor: "#fff",
+        padding: "20px",
+        borderRadius: "8px",
+        width: "300px",
+        boxSizing: "border-box",
+        boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+    },
+    input: {
+        padding: "8px",
+        fontSize: "1rem",
+        borderRadius: "4px",
+        border: "1px solid #ccc",
+        width: "100%",
+        boxSizing: "border-box",
+    },
+    buttonRow: {
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: "10px",
+    },
+};
+
 
 export default HouseholdPage;
