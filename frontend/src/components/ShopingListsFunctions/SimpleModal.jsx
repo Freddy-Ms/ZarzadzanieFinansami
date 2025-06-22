@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+
 export default function SimpleModal({
     list,
     products,
@@ -10,17 +12,46 @@ export default function SimpleModal({
     setProductId,
     handleDeleteProduct,
 }) {
+    const [householdMap, setHouseholdMap] = useState({});
+
+    useEffect(() => {
+        fetch("http://127.0.0.1:5000/household/get", {
+            method: "GET",
+            credentials: "include",
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const map = {};
+                data.forEach((h) => {
+                    map[h.id] = h.name;
+                });
+                setHouseholdMap(map);
+            });
+    }, []);
+
     return (
         <div style={styles.modal}>
             <div style={styles.header}>
-                <h2 style={styles.title}>{list.name}</h2>
+                <h2 style={styles.title}>
+                    {list.name}
+                    {list.household_id && (
+                        <span style={{ fontSize: "0.8em", color: "gray" }}>
+                            {" "}
+                            ({householdMap[list.household_id]})
+                        </span>
+                    )}
+                </h2>
                 <div style={styles.buttonsContainer}>
                     <button
                         onClick={handleDeleteList}
                         style={styles.deleteButton}
                         title="Delete list"
-                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#e63946")}
-                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#ff4d4d")}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor = "#e63946")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor = "#ff4d4d")
+                        }
                     >
                         🗑️
                     </button>
@@ -28,8 +59,12 @@ export default function SimpleModal({
                         onClick={onClose}
                         style={styles.buttonCancel}
                         aria-label="Close modal"
-                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#b0b0b0")}
-                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#ccc")}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor = "#b0b0b0")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor = "#ccc")
+                        }
                     >
                         ×
                     </button>
@@ -68,8 +103,14 @@ export default function SimpleModal({
                                                 setProductId(product.id);
                                             }}
                                             title="Edit product"
-                                            onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#d6e9ff")}
-                                            onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#f0f8ff")}
+                                            onMouseEnter={(e) =>
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "#d6e9ff")
+                                            }
+                                            onMouseLeave={(e) =>
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "#f0f8ff")
+                                            }
                                         >
                                             ✏️
                                         </button>
@@ -79,8 +120,14 @@ export default function SimpleModal({
                                                 handleDeleteProduct(product.id);
                                             }}
                                             title="Delete product"
-                                            onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#e63946")}
-                                            onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#ff4d4d")}
+                                            onMouseEnter={(e) =>
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "#e63946")
+                                            }
+                                            onMouseLeave={(e) =>
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "#ff4d4d")
+                                            }
                                         >
                                             🗑️
                                         </button>
@@ -101,8 +148,12 @@ export default function SimpleModal({
                         setIsEditMode(false);
                     }}
                     style={styles.buttonAdd}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#2c7a2c")}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#28a745")}
+                    onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#2c7a2c")
+                    }
+                    onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#28a745")
+                    }
                 >
                     ➕ Add product
                 </button>
