@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -7,6 +8,8 @@ const ProfilePage = () => {
     const [error, setError] = useState(null);
     const [username, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [household, setHousehold] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -70,9 +73,16 @@ const ProfilePage = () => {
         setEmail(user.email);
         setHousehold(user.household || "");
         setIsEditing(false);
+        setNewPassword("");
+        setConfirmPassword("");
     };
 
     const handleSave = async () => {
+        if (newPassword && newPassword !== confirmPassword) {
+            toast.error("Passwords do not match", { autoClose: 3000 });
+            return;
+        }
+
         try {
             const response = await fetch("http://127.0.0.1:5000/user/edit", {
                 method: "POST",
@@ -83,6 +93,7 @@ const ProfilePage = () => {
                 body: JSON.stringify({
                     username: username,
                     email: email,
+                    new_password: newPassword,
                 }),
             });
 
@@ -92,12 +103,14 @@ const ProfilePage = () => {
                 throw new Error(data.message || "Error while writing data");
             }
 
-            alert(data.message || "Profile updated successfully");
+            toast.success(data.message, { autoClose: 3000 });
 
             setUser((prev) => ({ ...prev, username: username, email: email }));
+            setNewPassword("");
+            setConfirmPassword("");
             setIsEditing(false);
         } catch (err) {
-            alert("Błąd: " + err.message);
+            toast.error("Error: " + err.message, { autoClose: 3000 });
         }
     };
 
@@ -117,16 +130,18 @@ const ProfilePage = () => {
                 throw new Error(data.message || "Error deleting account");
             }
 
-            alert(data.message || "Account deleted successfully");
+            toast.success("Account deleted successfully", { autoClose: 3000 })
 
             navigate("/");
         } catch (err) {
-            alert("Błąd: " + err.message);
+            toast.error("Error: " + err.message, { autoClose: 3000 });
         }
     };
 
     return (
+        
         <div style={styles.pageWrapper}>
+            <ToastContainer />
             <div style={styles.outerContainer}>
                 <button
                     style={styles.backButton}
@@ -201,6 +216,34 @@ const ProfilePage = () => {
                                                         (e.currentTarget.style.borderColor =
                                                             styles.input.borderColor)
                                                     }
+                                                />
+                                            </label>
+                                            <label style={styles.label}>
+                                                New Password:
+                                                <input
+                                                    type="password"
+                                                    value={newPassword}
+                                                    onChange={(e) =>
+                                                        setNewPassword(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    style={styles.input}
+                                                    placeholder="Enter new password"
+                                                />
+                                            </label>
+                                            <label style={styles.label}>
+                                                Confirm New Password:
+                                                <input
+                                                    type="password"
+                                                    value={confirmPassword}
+                                                    onChange={(e) =>
+                                                        setConfirmPassword(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    style={styles.input}
+                                                    placeholder="Repeat new password"
                                                 />
                                             </label>
                                             <p>
