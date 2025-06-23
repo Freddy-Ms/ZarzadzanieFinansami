@@ -1,11 +1,13 @@
-import React, {  } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PurchaseList from "./PurchaseEventFunctions/PurchaseListFun";
+import AddPurchase from "./PurchaseEventFunctions/AddPurchase";
 
 export default function PurchaseEventPage() {
     const navigate = useNavigate();
+    const [showAddPanel, setShowAddPanel] = React.useState(false);
 
     return (
         <div style={styles.pageWrapper}>
@@ -29,13 +31,40 @@ export default function PurchaseEventPage() {
                 <div style={styles.twoColumnRow}>
                     <div style={styles.rightPanel}>
                         <div style={styles.infoBox}>
-                            <PurchaseList />
+                            <PurchaseList
+                                list={{ products: [] }}
+                                onClose={() => {}}
+                                onCreated={() => {}}
+                            />
                         </div>
+                        <button
+                            onClick={() => setShowAddPanel(true)}
+                            style={{
+                                padding: "10px",
+                                borderRadius: "6px",
+                                border: "none",
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Add Purchased List
+                        </button>
                     </div>
 
                     <div style={styles.leftPanel}>
                         <div style={styles.panel}>
-                            <h2 style={styles.title}>User Profile</h2>
+                            {showAddPanel ? (
+                                <AddPurchase
+                                    onClose={() => setShowAddPanel(false)}
+                                    onCreated={() => setShowAddPanel(false)}
+                                />
+                            ) : (
+                                <p>
+                                    ← Wybierz opcję po prawej stronie lub
+                                    kliknij "Add Purchased List".
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -49,7 +78,8 @@ const styles = {
         minHeight: "100vh",
         backgroundColor: "#0077cc",
         padding: "40px 20px",
-        width: "100vw",
+        maxWidth: "100vw",
+        width: "99vw",
         boxSizing: "border-box",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         color: "#1e293b",
@@ -178,7 +208,7 @@ const styles = {
         flexWrap: "nowrap",
     },
     leftPanel: {
-        flex: 3,
+        flex: 4,
         backgroundColor: "#fff",
         borderRadius: "10px",
         padding: "20px",

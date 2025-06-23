@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import PurchaseList from "./AddPurchaseList";
+import ModalShoppingListDetails from "../ShopingListsFunctions/ModalShoppingListDetails";
+import AddPurchaseList from "./AddPurchaseList";
 
-function PurcaseLists() {
+function PurchaseLists() {
     const [lists, setLists] = useState([]);
     const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
     const [selectedList, setSelectedList] = useState(null);
     const [filterText, setFilterText] = useState("");
     const [households, setHouseholds] = useState([]);
@@ -186,29 +186,8 @@ function PurcaseLists() {
                     />
                 )}
             </div>
-
-            <button
-                onClick={() => setShowModal(true)}
-                style={{
-                    padding: "10px",
-                    borderRadius: "6px",
-                    border: "none",
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    cursor: "pointer",
-                }}
-            >
-                Add Purchased List
-            </button>
-
-            {showModal && (
-                <PurchaseList
-                    onClose={() => setShowModal(false)}
-                    onCreated={fetchLists}
-                />
-            )}
         </div>
     );
 }
 
-export default PurcaseLists;
+export default PurchaseLists;

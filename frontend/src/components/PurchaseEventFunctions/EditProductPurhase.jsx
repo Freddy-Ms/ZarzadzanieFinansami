@@ -1,69 +1,189 @@
-export default function EditModal() {
+import React, { useEffect } from "react";
+
+export default function EditModal({
+    subcategories,
+    newProductName,
+    setNewProductName,
+    quantity,
+    setQuantity,
+    subcategoryId,
+    setSubcategoryId,
+    setShowEditModal,
+    setShowAddModal,
+    error,
+    message,
+    setError,
+    setMessage,
+    inputRef,
+    productId,
+    products,
+}) {
+    useEffect(() => {
+        if (productId) {
+            const product = products.find((p) => p.id === Number(productId));
+            if (product) {
+                setNewProductName(product.name);
+                setQuantity(product.quantity);
+                setSubcategoryId(product.subcategory_id || "");
+            }
+        }
+    }, [productId]);
+
     return (
-        <div style={styles.backdrop}>
-            <div style={styles.modal}>
-                <h2
-                    style={{
-                        ...styles.title,
-                        marginBottom: "10px",
-                        marginTop: 0,
-                    }}
-                >
-                    Dodaj listę zakupów
-                </h2>
+        <div style={{ ...styles.modal, width: "420px" }}>
+            <h2 style={styles.heading}>Edit product</h2>
+
+            <div style={styles.fieldGroup}>
+                <label style={styles.label}>Product name:</label>
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={newProductName}
+                    onChange={(e) => setNewProductName(e.target.value)}
+                    style={styles.input}
+                    placeholder="Enter product name"
+                />
             </div>
+
+            <div style={styles.fieldGroup}>
+                <label style={styles.label}>Quantity:</label>
+                <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    style={styles.input}
+                />
+            </div>
+
+            <div style={styles.fieldGroup}>
+                <label style={styles.label}>Category:</label>
+                <SubcategoryCombo
+                    subcategories={subcategories}
+                    onSelect={setSubcategoryId}
+                    selectedSubcategoryId={subcategoryId}
+                />
+            </div>
+
+            <div style={styles.buttonsRow}>
+                <button type="submit" style={styles.buttonAdd}>
+                    Save changes
+                </button>
+                <button
+                    type="button"
+                    onClick={() => {
+                        setShowEditModal(false);
+                        setShowAddModal(true);
+                        setError(null);
+                        setMessage(null);
+                    }}
+                    style={styles.buttonCancel}
+                >
+                    Cancel
+                </button>
+            </div>
+
+            {error && <div style={styles.error}>{error}</div>}
+            {message && <div style={styles.message}>{message}</div>}
         </div>
     );
 }
 
 const styles = {
-    backdrop: {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-    },
     modal: {
         backgroundColor: "#fff",
-        borderRadius: "12px",
-        padding: "2rem",
-        width: "100%",
-        maxWidth: "500px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        padding: "28px 32px",
+        borderRadius: "14px",
+        maxWidth: "600px",
+        boxShadow: "0 6px 18px rgba(0, 0, 0, 0.15)",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        color: "#222",
     },
-    title: {
-        fontSize: "1.5rem",
-        textAlign: "center",
+    heading: {
+        marginBottom: "24px",
+        fontWeight: "700",
+        fontSize: "1.8rem",
+        color: "#333",
+        userSelect: "none",
     },
     input: {
-        padding: "0.75rem",
-        border: "1px solid #ccc",
-        borderRadius: "8px",
+        padding: "10px 14px",
         fontSize: "1rem",
+        borderRadius: "8px",
+        width: "100%",
+        boxSizing: "border-box",
+        border: "1.5px solid #5a8dee",
+        backgroundColor: "#f0f5ff",
+        color: "#1a1a1a",
+        transition: "border-color 0.3s ease",
+        outline: "none",
+    },
+    inputFocus: {
+        borderColor: "#3a66d1",
+        backgroundColor: "#e1e9ff",
     },
     buttonAdd: {
-        padding: "0.5rem 1.25rem",
-        backgroundColor: "#007bff",
+        padding: "12px 20px",
+        backgroundColor: "#3a66d1",
         color: "#fff",
         border: "none",
         borderRadius: "8px",
         cursor: "pointer",
+        fontWeight: "700",
+        fontSize: "1rem",
+        transition: "background-color 0.3s ease",
+        flexGrow: 1,
+        marginRight: "12px",
+    },
+    buttonAddHover: {
+        backgroundColor: "#2e4ea2",
     },
     buttonCancel: {
-        padding: "0.5rem 1.25rem",
-        backgroundColor: "#ccc",
-        color: "#333",
+        padding: "12px 20px",
+        backgroundColor: "#d3d3d3",
+        color: "#555",
         border: "none",
         borderRadius: "8px",
         cursor: "pointer",
+        fontWeight: "600",
+        fontSize: "1rem",
+        flexGrow: 1,
+        transition: "background-color 0.3s ease",
+    },
+    buttonCancelHover: {
+        backgroundColor: "#bfbfbf",
+    },
+    error: {
+        marginTop: "18px",
+        color: "#d32f2f",
+        fontWeight: "700",
+        fontSize: "0.95rem",
+        userSelect: "none",
+    },
+    message: {
+        marginTop: "18px",
+        color: "#388e3c",
+        fontWeight: "700",
+        fontSize: "0.95rem",
+        userSelect: "none",
+    },
+    fieldGroup: {
+        marginBottom: "18px",
+        display: "flex",
+        flexDirection: "column",
+    },
+    label: {
+        marginBottom: "6px",
+        fontWeight: "600",
+        fontSize: "1rem",
+        color: "#444",
+        userSelect: "none",
+    },
+    buttonsRow: {
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: "20px",
     },
 };
-

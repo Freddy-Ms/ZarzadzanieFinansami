@@ -1,21 +1,24 @@
 import React from "react";
 
 export default function AddModal({
-    handleSubmit,
-    setName,
-    name,
-    selectedHousehold,
-    setSelectedHousehold,
-    households,
-    setReceiptFile,
-    receiptFile,
-    loadingOcr,
-    products,
-    onClose,
-    inputRef,
-    setShowEditModal,
 }) {
     return (
+        <div style={styles.modalRow}>
+            <div style={styles.backdrop}>
+                <div style={styles.modal}>
+                    <h2
+                        style={{
+                            ...styles.title,
+                            marginBottom: "10px",
+                            marginTop: 0,
+                        }}
+                    >
+                        Dodaj listę zakupów
+                    </h2>
+                </div>
+            </div>
+        </div>
+        /*
         <div style={styles.backdrop}>
             <div style={styles.modal}>
                 <h2
@@ -59,7 +62,7 @@ export default function AddModal({
                         ))}
                     </select>
 
-                    {/* Sekcja dodawania paragonu */}
+                    {/* Sekcja dodawania paragonu *}
                     {!receiptFile ? (
                         <div
                             style={{
@@ -158,9 +161,7 @@ export default function AddModal({
                                             padding: "0.3rem 0.7rem",
                                             cursor: "pointer",
                                         }}
-                                        onClick={() => {
-                                            setShowEditModal(true);
-                                        }}
+                                        onClick={() => {}}
                                     >
                                         Edytuj
                                     </button>
@@ -189,7 +190,7 @@ export default function AddModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </div>*/
     );
 }
 
