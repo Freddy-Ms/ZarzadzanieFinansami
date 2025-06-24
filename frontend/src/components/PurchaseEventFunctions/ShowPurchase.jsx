@@ -37,7 +37,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(data.message || "Błąd serwera");
+                    throw new Error(data.message);
                 }
 
                 if (!Array.isArray(data.events)) {
@@ -113,7 +113,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Błąd zapisu");
+                throw new Error(data.message);
             }
 
             toast.success("Zaktualizowano listę zakupów");
@@ -146,6 +146,37 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
             } else {
                 toast.error(data.message);
             }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
+    const removeProduct = async (productId) => {
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/purchaseevent/product/remove",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id: productId }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+
+            toast.success("Produkt usunięty");
+
+            setEvent((prevEvent) => ({
+                ...prevEvent,
+                products: prevEvent.products.filter((p) => p.id !== productId),
+            }));
         } catch (error) {
             toast.error(error.message);
         }
@@ -410,7 +441,6 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                     >
                                         {product.name}
                                     </div>
-                                    {/* Quantity */}
                                     {product.quantity !== undefined && (
                                         <div
                                             style={{
@@ -426,7 +456,6 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                             {product.quantity}
                                         </div>
                                     )}
-                                    {/* Unit */}
                                     {product.unit && (
                                         <div
                                             style={{
@@ -444,7 +473,6 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                             {product.unit}
                                         </div>
                                     )}
-                                    {/* Price */}
                                     {product.price !== undefined && (
                                         <div
                                             style={{
@@ -462,7 +490,6 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                             {product.price} zł
                                         </div>
                                     )}
-                                    {/* Subcategory */}
                                     {product.subcategory && (
                                         <div
                                             style={{
@@ -495,7 +522,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                             }}
                                             onClick={() => {
                                                 toast.info(
-                                                    "Funkcja usuwania w przygotowaniu"
+                                                    "Funkcja edycji w przygotowaniu"
                                                 );
                                             }}
                                         >
@@ -510,11 +537,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                 padding: "0.3rem 0.7rem",
                                                 cursor: "pointer",
                                             }}
-                                            onClick={() => {
-                                                toast.info(
-                                                    "Funkcja usuwania w przygotowaniu"
-                                                );
-                                            }}
+                                            onClick={() =>
+                                                removeProduct(product.id)
+                                            }
                                         >
                                             🗑️
                                         </button>
