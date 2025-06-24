@@ -1,21 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthContext } from "../protection/AuthProvider";
 
 export default function LoginRegisterPage() {
-    // logowanie
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
 
-    // rejestracja
     const [regUsername, setRegUsername] = useState("");
     const [regEmail, setRegEmail] = useState("");
     const [regPassword, setRegPassword] = useState("");
     const [registerMsg, setRegisterMsg] = useState("");
 
     const navigate = useNavigate();
+    const { setIsAuthenticated } = useContext(AuthContext);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -37,15 +37,12 @@ export default function LoginRegisterPage() {
 
             const data = await response.json();
 
-            console.log("Response code:", response.status);
-            console.log("Message content:", data.message);
-
             if (response.status !== 200) {
                 toast.error("Login error: " + data.message, {
                     autoClose: 3000,
                 });
             } else {
-                toast.success("Logged in!", { autoClose: 3000 });
+                setIsAuthenticated(true);
                 navigate("/homepage");
             }
         } catch (error) {

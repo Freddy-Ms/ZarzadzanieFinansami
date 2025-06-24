@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     PieChart,
@@ -13,11 +13,13 @@ import {
     CartesianGrid,
     ResponsiveContainer,
 } from "recharts";
-import Sidebar from "./ShopingListsFunctions/ShopingListsFun";
 import ShoppingLists from "./ShopingListsFunctions/ShopingListsFun";
+import { AuthContext } from "../protection/AuthProvider";
 
 export default function HomePage() {
     const navigate = useNavigate();
+    const { setIsAuthenticated } = useContext(AuthContext);
+
     const [chartData, setChartData] = useState([]);
     const [historyData, setHistoryData] = useState([]);
     const [prediction, setPrediction] = useState({
@@ -107,6 +109,7 @@ export default function HomePage() {
     }, [householdId]);
 
     const handleLogout = () => {
+        setIsAuthenticated(false);
         navigate("/");
     };
 

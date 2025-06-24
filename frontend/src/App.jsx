@@ -5,19 +5,50 @@ import HomePage from "./components/HomePage";
 import ProfilePage from "./components/ProfilePage";
 import HouseholdPage from "./components/HouseholdPage";
 import PurchaseEventPage from "./components/PurchaseEventPage";
-import EditPage from "./components/EditPage";
+import { AuthProvider } from "./protection/AuthProvider";
+import ProtectedRoute from "./protection/ProtectedRoute";
 
 function App() {
     return (
         <Router>
-            <Routes>
-                <Route path="/" element={<StartPage />} />
-                <Route path="/login_register" element={<LoginRegisterPage />} />
-                <Route path="/homepage" element={<HomePage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/household" element={<HouseholdPage />} />
-                <Route path="/purchaseEvent" element={<PurchaseEventPage />} />
-            </Routes>
+            <AuthProvider>
+                <Routes>
+                    <Route path="/" element={<StartPage />} />
+                    <Route path="/login_register" element={<LoginRegisterPage />} />
+                    <Route
+                        path="/homepage"
+                        element={
+                            <ProtectedRoute>
+                                <HomePage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute>
+                                <ProfilePage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/household"
+                        element={
+                            <ProtectedRoute>
+                                <HouseholdPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/purchaseEvent"
+                        element={
+                            <ProtectedRoute>
+                                <PurchaseEventPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </AuthProvider>
         </Router>
     );
 }
