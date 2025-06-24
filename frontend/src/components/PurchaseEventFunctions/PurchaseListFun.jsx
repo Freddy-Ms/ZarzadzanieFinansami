@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import ModalShoppingListDetails from "../ShopingListsFunctions/ModalShoppingListDetails";
 
-function PurchaseLists({ setShowViewPanel, setShowAddPanel }) {
+function PurchaseLists({
+    setShowViewPanel,
+    setShowAddPanel,
+    setEditPurchaseID,
+    setUserOrHouseholdID,
+}) {
     const [lists, setLists] = useState([]);
     const [error, setError] = useState(null);
-    const [selectedList, setSelectedList] = useState(null);
     const [filterText, setFilterText] = useState("");
     const [households, setHouseholds] = useState([]);
     const [selectedHousehold, setSelectedHousehold] = useState("private");
@@ -163,6 +166,8 @@ function PurchaseLists({ setShowViewPanel, setShowAddPanel }) {
                             onClick={() => {
                                 setShowViewPanel(true);
                                 setShowAddPanel(false);
+                                setEditPurchaseID(list.id);
+                                setUserOrHouseholdID(selectedHousehold);
                             }}
                             style={{
                                 maxWidth: "100%",

@@ -10,6 +10,8 @@ export default function PurchaseEventPage() {
     const navigate = useNavigate();
     const [showAddPanel, setShowAddPanel] = useState(false);
     const [showViewPanel, setShowViewPanel] = useState(false);
+    const [editPurchaseID, setEditPurchaseID] = useState(null);
+    const [userOrHouseholdID, setUserOrHouseholdID] = useState("private");
 
     return (
         <div style={styles.pageWrapper}>
@@ -39,6 +41,8 @@ export default function PurchaseEventPage() {
                                 onCreated={() => {}}
                                 setShowViewPanel={setShowViewPanel}
                                 setShowAddPanel={setShowAddPanel}
+                                setEditPurchaseID={setEditPurchaseID}
+                                setUserOrHouseholdID={setUserOrHouseholdID}
                             />
                         </div>
                         <button
@@ -68,6 +72,8 @@ export default function PurchaseEventPage() {
                             ) : showViewPanel ? (
                                 <ShowPurchase
                                     onClose={() => setShowViewPanel(false)}
+                                    editPurchaseID={editPurchaseID}
+                                    userOrHouseholdID={userOrHouseholdID}
                                 />
                             ) : (
                                 <p>
