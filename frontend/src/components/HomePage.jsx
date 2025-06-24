@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     PieChart,
@@ -18,29 +18,93 @@ import ShoppingLists from "./ShopingListsFunctions/ShopingListsFun";
 
 export default function HomePage() {
     const navigate = useNavigate();
-    const chartData = [
-        { name: "Food", value: 300 },
-        { name: "Transport", value: 150 },
-        { name: "Entertainment", value: 100 },
-        { name: "Bills", value: 200 },
-    ];
-
-    const historyData = [
-        { month: "Jan", spent: 200 },
-        { month: "Feb", spent: 180 },
-        { month: "Mar", spent: 240 },
-        { month: "Apr", spent: 220 },
-        { month: "May", spent: 300 },
-        { month: "Jun", spent: 280 },
-    ];
-
+    const [chartData, setChartData] = useState([]);
+    const [historyData, setHistoryData] = useState([]);
+    const [prediction, setPrediction] = useState({
+        spent_so_far_this_month: 0,
+        predicted_total_this_month: 0,
+        predicted_total_next_month: 0,
+    });
+    const householdId = null;
     const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042"];
+    const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
-    const prediction = {
-        spent_so_far_this_month: 220.0,
-        predicted_total_this_month: 420.5,
-        predicted_total_next_month: 460.8,
-    };
+    useEffect(() => {
+        async function fetchPrediction() {
+            try {
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ household_id: householdId || null }),
+                });
+                const data = await response.json();
+                if (!response.ok)
+                    throw new Error(
+                        data.message || "Error fetching prediction"
+                    );
+
+                const historyArr = Object.entries(data.history).map(
+                    ([month, spent]) => ({
+                        month,
+                        spent,
+                    })
+                );
+
+                setHistoryData(historyArr);
+                setPrediction({
+                    spent_so_far_this_month: data.spent_so_far_this_month,
+                    predicted_total_this_month: data.predicted_total_this_month,
+                    predicted_total_next_month: data.predicted_total_next_month,
+                });
+            } catch (err) {
+                console.error("Prediction fetch error:", err);
+            }
+        }
+
+        fetchPrediction();
+    }, [householdId]);
+
+    // Pobranie podsumowania miesięcznego (kategorie do wykresu kołowego)
+    useEffect(() => {
+        async function fetchMonthlySummary() {
+            try {
+                const now = new Date();
+                const month = now.getMonth() + 1;
+                const year = now.getFullYear();
+
+                const response = await fetch(
+                    "http://127.0.0.1:5000/summary/monthly",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                            month,
+                            year,
+                            household_id: householdId || null,
+                        }),
+                    }
+                );
+                const data = await response.json();
+                if (!response.ok)
+                    throw new Error(
+                        data.message || "Error fetching monthly summary"
+                    );
+
+                // Mapowanie podsumowania do formatu dla PieChart
+                const pieData = data.map((cat) => ({
+                    name: cat.category,
+                    value: cat.total,
+                }));
+
+                setChartData(pieData);
+            } catch (err) {
+                console.error("Monthly summary fetch error:", err);
+            }
+        }
+        fetchMonthlySummary();
+    }, [householdId]);
 
     const handleLogout = () => {
         navigate("/");
@@ -157,7 +221,7 @@ export default function HomePage() {
                     <div style={styles.leftColumn}>
                         <div style={styles.chartCard}>
                             <h2 style={{ marginBottom: 20, color: "black" }}>
-                                Expenses This Month
+                                Expenses This Month – {total.toFixed(2)} PLN
                             </h2>
                             <PieChart width={400} height={300}>
                                 <Pie
@@ -168,7 +232,7 @@ export default function HomePage() {
                                     outerRadius={100}
                                     fill="#8884d8"
                                     dataKey="value"
-                                    label
+                                    label={() => null}
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell
@@ -194,7 +258,14 @@ export default function HomePage() {
                                                 borderRadius: 3,
                                             }}
                                         />
-                                        <span>{entry.name}</span>
+                                        <span>
+                                            {entry.name} –{" "}
+                                            {(
+                                                (entry.value / total) *
+                                                100
+                                            ).toFixed(1)}
+                                            %
+                                        </span>
                                     </div>
                                 ))}
                             </div>

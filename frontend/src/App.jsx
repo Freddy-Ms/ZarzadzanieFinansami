@@ -17,7 +17,6 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/household" element={<HouseholdPage />} />
                 <Route path="/purchaseEvent" element={<PurchaseEventPage />} />
-                <Route path="/edit" element={<EditPage />} />
             </Routes>
         </Router>
     );
