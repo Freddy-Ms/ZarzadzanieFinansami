@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ModalShoppingListDetails from "../ShopingListsFunctions/ModalShoppingListDetails";
 
-function PurchaseLists() {
+function PurchaseLists({ setShowViewPanel, setShowAddPanel }) {
     const [lists, setLists] = useState([]);
     const [error, setError] = useState(null);
     const [selectedList, setSelectedList] = useState(null);
@@ -160,7 +160,10 @@ function PurchaseLists() {
                         <li
                             key={list.id}
                             title={list.name}
-                            onClick={() => setSelectedList(list)}
+                            onClick={() => {
+                                setShowViewPanel(true);
+                                setShowAddPanel(false);
+                            }}
                             style={{
                                 maxWidth: "100%",
                                 backgroundColor: "#d9ebff",
@@ -178,12 +181,6 @@ function PurchaseLists() {
                         </li>
                     ))}
                 </ul>
-                {selectedList && (
-                    <ModalShoppingListDetails
-                        list={selectedList}
-                        onClose={() => setSelectedList(null)}
-                    />
-                )}
             </div>
         </div>
     );

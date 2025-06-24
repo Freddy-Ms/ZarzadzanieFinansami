@@ -1,34 +1,9 @@
 import React, { useEffect } from "react";
 
 export default function EditModal({
-    subcategories,
-    newProductName,
-    setNewProductName,
-    quantity,
-    setQuantity,
-    subcategoryId,
-    setSubcategoryId,
-    setShowEditModal,
-    setShowAddModal,
-    error,
-    message,
-    setError,
-    setMessage,
-    inputRef,
-    productId,
-    products,
-}) {
-    useEffect(() => {
-        if (productId) {
-            const product = products.find((p) => p.id === Number(productId));
-            if (product) {
-                setNewProductName(product.name);
-                setQuantity(product.quantity);
-                setSubcategoryId(product.subcategory_id || "");
-            }
-        }
-    }, [productId]);
+    newProductName
 
+}) {
     return (
         <div style={{ ...styles.modal, width: "420px" }}>
             <h2 style={styles.heading}>Edit product</h2>
@@ -36,7 +11,6 @@ export default function EditModal({
             <div style={styles.fieldGroup}>
                 <label style={styles.label}>Product name:</label>
                 <input
-                    ref={inputRef}
                     type="text"
                     value={newProductName}
                     onChange={(e) => setNewProductName(e.target.value)}
@@ -71,20 +45,12 @@ export default function EditModal({
                 </button>
                 <button
                     type="button"
-                    onClick={() => {
-                        setShowEditModal(false);
-                        setShowAddModal(true);
-                        setError(null);
-                        setMessage(null);
-                    }}
+                    onClick={onClose}
                     style={styles.buttonCancel}
                 >
                     Cancel
                 </button>
             </div>
-
-            {error && <div style={styles.error}>{error}</div>}
-            {message && <div style={styles.message}>{message}</div>}
         </div>
     );
 }

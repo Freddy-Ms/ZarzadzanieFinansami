@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PurchaseList from "./PurchaseEventFunctions/PurchaseListFun";
 import AddPurchase from "./PurchaseEventFunctions/AddPurchase";
+import ShowPurchase from "./PurchaseEventFunctions/ShowPurchase";
 
 export default function PurchaseEventPage() {
     const navigate = useNavigate();
-    const [showAddPanel, setShowAddPanel] = React.useState(false);
+    const [showAddPanel, setShowAddPanel] = useState(false);
+    const [showViewPanel, setShowViewPanel] = useState(false);
 
     return (
         <div style={styles.pageWrapper}>
@@ -35,10 +37,15 @@ export default function PurchaseEventPage() {
                                 list={{ products: [] }}
                                 onClose={() => {}}
                                 onCreated={() => {}}
+                                setShowViewPanel={setShowViewPanel}
+                                setShowAddPanel={setShowAddPanel}
                             />
                         </div>
                         <button
-                            onClick={() => setShowAddPanel(true)}
+                            onClick={() => {
+                                setShowAddPanel(true);
+                                setShowViewPanel(false);
+                            }}
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
@@ -57,7 +64,10 @@ export default function PurchaseEventPage() {
                             {showAddPanel ? (
                                 <AddPurchase
                                     onClose={() => setShowAddPanel(false)}
-                                    onCreated={() => setShowAddPanel(false)}
+                                />
+                            ) : showViewPanel ? (
+                                <ShowPurchase
+                                    onClose={() => setShowViewPanel(false)}
                                 />
                             ) : (
                                 <p>

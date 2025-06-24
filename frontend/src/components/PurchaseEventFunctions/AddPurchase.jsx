@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import EditModal from "./EditProductPurhase";
 
 export default function AddPurchase({ onClose, onCreated }) {
-    const navigate = useNavigate();
-
     const [name, setName] = useState("");
     const [selectedHousehold, setSelectedHousehold] = useState("private");
     const [receiptFile, setReceiptFile] = useState(null);
@@ -75,7 +73,7 @@ export default function AddPurchase({ onClose, onCreated }) {
                 throw new Error(data.message || "Creation failed");
             }
 
-            toast.success(data.message || "Lista zakupów dodana pomyślnie!");
+            toast.success(data.message);
             onCreated();
             onClose();
             window.location.reload();
@@ -117,6 +115,15 @@ export default function AddPurchase({ onClose, onCreated }) {
         }
     };
 
+    const handleDeleteProduct = (index) => {
+        const newOcrProducts = [...ocrProducts];
+        const newProducts = [...products];
+        newOcrProducts.splice(index, 1);
+        newProducts.splice(index, 1);
+        setOcrProducts(newOcrProducts);
+        setProducts(newProducts);
+    };
+
     const onFileSelected = async (file) => {
         setReceiptFile(file);
         const ocrProducts = await handleOcrUpload(file);
@@ -127,10 +134,9 @@ export default function AddPurchase({ onClose, onCreated }) {
     return (
         <div
             style={{
-                padding: "20px",
-                border: "1px solid #ddd",
-                borderRadius: "12px",
+                padding: "0px",
                 maxWidth: "100vw",
+                width: "100%",
                 backgroundColor: "#fff",
                 margin: "auto",
             }}
@@ -266,21 +272,36 @@ export default function AddPurchase({ onClose, onCreated }) {
                                 <span>
                                     <strong>{p.name}</strong> – {p.price} zł
                                 </span>
-                                <button
-                                    style={{
-                                        backgroundColor: "#007bff",
-                                        color: "#fff",
-                                        border: "none",
-                                        borderRadius: "4px",
-                                        padding: "0.3rem 0.7rem",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={() => {
-                                        navigate("/edit");
-                                    }}
-                                >
-                                    Edytuj
-                                </button>
+                                <div>
+                                    <button
+                                        style={{
+                                            backgroundColor: "#007bff",
+                                            color: "#fff",
+                                            border: "none",
+                                            borderRadius: "4px",
+                                            padding: "0.3rem 0.7rem",
+                                            cursor: "pointer",
+                                        }}
+                                        onClick={() => {
+                                            <EditModal />;
+                                        }}
+                                    >
+                                        ✏️
+                                    </button>
+                                    <button
+                                        style={{
+                                            backgroundColor: "#ff0000",
+                                            color: "#fff",
+                                            border: "none",
+                                            borderRadius: "4px",
+                                            padding: "0.3rem 0.7rem",
+                                            cursor: "pointer",
+                                        }}
+                                        onClick={() => handleDeleteProduct(i)}
+                                    >
+                                        🗑️
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
