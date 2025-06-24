@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import ModalShoppingListDetails from "../ShopingListsFunctions/ModalShoppingListDetails";
-import AddPurchaseList from "./AddPurchaseList";
 
 function PurchaseLists() {
     const [lists, setLists] = useState([]);

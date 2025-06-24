@@ -5,6 +5,7 @@ import HomePage from "./components/HomePage";
 import ProfilePage from "./components/ProfilePage";
 import HouseholdPage from "./components/HouseholdPage";
 import PurchaseEventPage from "./components/PurchaseEventPage";
+import EditPage from "./components/EditPage";
 
 function App() {
     return (
@@ -12,10 +13,11 @@ function App() {
             <Routes>
                 <Route path="/" element={<StartPage />} />
                 <Route path="/login_register" element={<LoginRegisterPage />} />
-                <Route path="/homepage" element={<HomePage/>} />
+                <Route path="/homepage" element={<HomePage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/household" element={<HouseholdPage />} />
                 <Route path="/purchaseEvent" element={<PurchaseEventPage />} />
+                <Route path="/edit" element={<EditPage />} />
             </Routes>
         </Router>
     );

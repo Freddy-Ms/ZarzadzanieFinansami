@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function AddPurchase({ onClose, onCreated }) {
+    const navigate = useNavigate();
+
     const [name, setName] = useState("");
     const [selectedHousehold, setSelectedHousehold] = useState("private");
     const [receiptFile, setReceiptFile] = useState(null);
@@ -42,21 +45,43 @@ export default function AddPurchase({ onClose, onCreated }) {
         fetchUserHouseholds();
     }, []);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Obsługa zapisu nowej listy zakupów
 
-        // Przykładowo możesz stworzyć obiekt do wysłania:
-        const newList = {
-            name,
-            householdId:
-                selectedHousehold === "private" ? null : selectedHousehold,
-            receipt: receiptFile,
-            products,
-        };
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append(
+            "householdId",
+            selectedHousehold === "private" ? "" : selectedHousehold
+        );
+        if (receiptFile) {
+            formData.append("receipt", receiptFile);
+        }
+        formData.append("products", JSON.stringify(products));
 
-        // Wywołaj callback, aby zamknąć formularz i/lub odświeżyć listę
-        onCreated(newList);
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/purchaseevent/create",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData,
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Creation failed");
+            }
+
+            toast.success(data.message || "Lista zakupów dodana pomyślnie!");
+            onCreated();
+            onClose();
+            window.location.reload();
+        } catch (err) {
+            toast.error("Error: " + err.message);
+        }
     };
 
     const handleOcrUpload = async (file) => {
@@ -98,7 +123,6 @@ export default function AddPurchase({ onClose, onCreated }) {
         setProducts(ocrProducts);
         setOcrProducts(ocrProducts);
     };
-    
 
     return (
         <div
@@ -212,7 +236,7 @@ export default function AddPurchase({ onClose, onCreated }) {
                         Przetwarzanie OCR...
                     </p>
                 )}
-                
+
                 {ocrProducts.length > 0 && (
                     <div
                         style={{
@@ -252,7 +276,7 @@ export default function AddPurchase({ onClose, onCreated }) {
                                         cursor: "pointer",
                                     }}
                                     onClick={() => {
-                                        // Obsługa edycji produktu
+                                        navigate("/edit");
                                     }}
                                 >
                                     Edytuj
