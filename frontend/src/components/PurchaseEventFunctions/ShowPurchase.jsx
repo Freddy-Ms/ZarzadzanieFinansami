@@ -589,7 +589,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     onChange={handleInputChange}
                                                     placeholder="Quantity"
                                                     style={{
-                                                        flex: "1 1 80px",
+                                                        flex: "0 0 70px",
                                                         backgroundColor:
                                                             "#f9f9f9",
                                                         padding: "0.5rem",
@@ -615,10 +615,23 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     }
                                                     onChange={handleInputChange}
                                                     style={{
+                                                        flex: "0 0 80px",
                                                         padding: "0.5rem",
                                                         borderRadius: "6px",
-                                                        border: "1px solid #ccc",
+                                                        border: "none",
                                                         width: "65px",
+                                                        backgroundColor:
+                                                            "#f9f9f9",
+                                                        boxShadow:
+                                                            "inset 0 0 5px rgba(100,100,100,0.1)",
+                                                        color: "black",
+                                                        outline: "none",
+                                                        fontFamily:
+                                                            "Consolas, monospace",
+                                                        whiteSpace: "nowrap",
+                                                        overflow: "hidden",
+                                                        textOverflow:
+                                                            "ellipsis",
                                                     }}
                                                 >
                                                     <option value="" disabled>
@@ -644,8 +657,20 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     style={{
                                                         padding: "0.5rem",
                                                         borderRadius: "6px",
-                                                        border: "1px solid #ccc",
-                                                        width: "129px",
+                                                        border: "none",
+                                                        flex: "0 0 30px",
+                                                        width: "165px",
+                                                        backgroundColor:
+                                                            "#fff8dc",
+                                                        boxShadow:
+                                                            "inset 0 0 5px rgba(218,165,32,0.3)",
+                                                        whiteSpace: "nowrap",
+                                                        overflow: "hidden",
+                                                        textOverflow:
+                                                            "ellipsis",
+                                                        color: "black",
+                                                        fontFamily:
+                                                            "Consolas, monospace",
                                                     }}
                                                 >
                                                     <option value="" disabled>
