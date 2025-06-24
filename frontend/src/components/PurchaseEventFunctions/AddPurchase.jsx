@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import EditModal from "./EditProductPurhase";
 
-export default function AddPurchase({ onClose, onCreated }) {
+export default function AddPurchase({ onClose }) {
     const [name, setName] = useState("");
     const [selectedHousehold, setSelectedHousehold] = useState("private");
     const [receiptFile, setReceiptFile] = useState(null);
@@ -43,9 +43,7 @@ export default function AddPurchase({ onClose, onCreated }) {
         fetchUserHouseholds();
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
+    const handleSubmit = async () => {
         const formData = new FormData();
         formData.append("name", name);
         formData.append(
@@ -74,7 +72,6 @@ export default function AddPurchase({ onClose, onCreated }) {
             }
 
             toast.success(data.message);
-            onCreated();
             onClose();
             window.location.reload();
         } catch (err) {
@@ -145,7 +142,7 @@ export default function AddPurchase({ onClose, onCreated }) {
                 Dodaj listę zakupów
             </h2>
             <form
-                onSubmit={handleSubmit}
+                onSubmit={(e) => e.preventDefault()}
                 style={{
                     display: "flex",
                     flexDirection: "column",
@@ -315,7 +312,8 @@ export default function AddPurchase({ onClose, onCreated }) {
                     }}
                 >
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={handleSubmit}
                         style={{
                             padding: "0.6rem 1.2rem",
                             borderRadius: "6px",

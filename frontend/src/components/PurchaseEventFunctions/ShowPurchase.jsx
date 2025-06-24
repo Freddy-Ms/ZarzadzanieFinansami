@@ -124,6 +124,33 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
         }
     };
 
+    const deletePurchaseEvent = async (editPurchaseID) => {
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/purchaseevent/delete",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ event_id: editPurchaseID }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.success(data.message);
+                window.location.reload();
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
     return (
         <div
             style={{
@@ -328,7 +355,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                             whiteSpace: "nowrap",
                                         }}
                                         onClick={() => {
-                                            setIsNameEditing(true);
+                                            deletePurchaseEvent(editPurchaseID);
                                         }}
                                     >
                                         🗑️
@@ -451,7 +478,29 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                             {product.subcategory}
                                         </div>
                                     )}
-                                    <div>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            gap: "6px",
+                                        }}
+                                    >
+                                        <button
+                                            style={{
+                                                backgroundColor: "#007bff",
+                                                color: "#fff",
+                                                border: "none",
+                                                borderRadius: "4px",
+                                                padding: "0.3rem 0.7rem",
+                                                cursor: "pointer",
+                                            }}
+                                            onClick={() => {
+                                                toast.info(
+                                                    "Funkcja usuwania w przygotowaniu"
+                                                );
+                                            }}
+                                        >
+                                            ✏️
+                                        </button>
                                         <button
                                             style={{
                                                 backgroundColor: "#ff0000",
