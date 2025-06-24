@@ -45,7 +45,7 @@ export default function SubcategoryCombo({
         <div style={{ position: "relative", width: "90%" }} ref={ref}>
             <input
                 type="text"
-                placeholder="Wybierz lub wpisz"
+                placeholder="Select category..."
                 value={filterText}
                 onChange={(e) => {
                     setFilterText(e.target.value);
