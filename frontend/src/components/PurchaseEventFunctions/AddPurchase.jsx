@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
-import EditModal from "./EditProductPurhase";
 
 export default function AddPurchase({ onClose }) {
     const [name, setName] = useState("");
@@ -47,7 +46,7 @@ export default function AddPurchase({ onClose }) {
         const formData = new FormData();
         formData.append("name", name);
         formData.append(
-            "householdId",
+            "household_id",
             selectedHousehold === "private" ? "" : selectedHousehold
         );
         if (receiptFile) {
@@ -269,36 +268,20 @@ export default function AddPurchase({ onClose }) {
                                 <span>
                                     <strong>{p.name}</strong> – {p.price} zł
                                 </span>
-                                <div>
-                                    <button
-                                        style={{
-                                            backgroundColor: "#007bff",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "4px",
-                                            padding: "0.3rem 0.7rem",
-                                            cursor: "pointer",
-                                        }}
-                                        onClick={() => {
-                                            <EditModal />;
-                                        }}
-                                    >
-                                        ✏️
-                                    </button>
-                                    <button
-                                        style={{
-                                            backgroundColor: "#ff0000",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "4px",
-                                            padding: "0.3rem 0.7rem",
-                                            cursor: "pointer",
-                                        }}
-                                        onClick={() => handleDeleteProduct(i)}
-                                    >
-                                        🗑️
-                                    </button>
-                                </div>
+
+                                <button
+                                    style={{
+                                        backgroundColor: "#ff0000",
+                                        color: "#fff",
+                                        border: "none",
+                                        borderRadius: "4px",
+                                        padding: "0.3rem 0.7rem",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => handleDeleteProduct(i)}
+                                >
+                                    🗑️
+                                </button>
                             </div>
                         ))}
                     </div>
