@@ -87,7 +87,7 @@ function PurchaseLists({
 
     useEffect(() => {
         fetchLists();
-    });
+    }, []);
 
     return (
         <div

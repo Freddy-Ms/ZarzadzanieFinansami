@@ -40,7 +40,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
 
     useEffect(() => {
         fetchEvent();
-    });
+    }, []);
 
     useEffect(() => {
         if (event && event.products) {
@@ -129,6 +129,8 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
     }, [editPurchaseID]);
 
     const fetchEvent = async () => {
+        if (!editPurchaseID) return;
+
         try {
             const response = await fetch(
                 "http://127.0.0.1:5000/purchaseevent/get",
@@ -301,9 +303,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
             ) {
                 toast.error("Quantity must be an integer greater than 0");
             } else if (!product.unit_id) {
-                toast.error("Unit cannot be empty");
+                product.unit_id = null;
             } else if (!product.subcategory_id) {
-                toast.error("Category cannot be empty");
+                product.subcategory_id = null;
             } else if (
                 product.price === null ||
                 product.price === undefined ||
@@ -361,11 +363,11 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
     const handleEditClick = (product) => {
         setEditedProduct({
             id: product.id,
-            name: "",
-            quantity: "",
-            unit_id: "",
-            subcategory_id: "",
-            price: "",
+            name: product.name,
+            quantity: product.quantity,
+            unit_id: product.unit_id,
+            subcategory_id: product.subcategory_id,
+            price: product.price,
         });
         setEditingProductId(product.id);
     };
