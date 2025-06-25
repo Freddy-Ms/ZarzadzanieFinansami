@@ -111,12 +111,19 @@ function PurchaseLists({
                     value={selectedHousehold}
                     onChange={(e) => setSelectedHousehold(e.target.value)}
                     style={{
-                        padding: "5px 10px",
-                        borderRadius: "5px",
-                        border: "1px solid #ccc",
-                        fontSize: "14px",
+                        padding: "8px 14px",
+                        borderRadius: "8px",
+                        border: "1px solid #d1d5db",
+                        fontSize: "15px",
                         cursor: "pointer",
+                        backgroundColor: "#f9fafb",
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                        color: "#111827",
+                        outline: "none",
+                        transition: "border-color 0.2s, box-shadow 0.2s",
                     }}
+                    onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
+                    onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
                 >
                     <option value="private">Private (only you)</option>
                     {households.map((h) => (
