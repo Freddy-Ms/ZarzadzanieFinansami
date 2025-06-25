@@ -92,9 +92,8 @@ const styles = {
     pageWrapper: {
         minHeight: "100vh",
         backgroundColor: "#0077cc",
-        padding: "20px 5px",
-        maxWidth: "100vw",
-        width: "99vw",
+        padding: "20px 30px",
+        width: "100vw",
         boxSizing: "border-box",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         color: "#1e293b",

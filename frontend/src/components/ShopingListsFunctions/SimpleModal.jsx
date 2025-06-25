@@ -11,6 +11,7 @@ export default function SimpleModal({
     setIsEditMode,
     setProductId,
     handleDeleteProduct,
+    subcategories,
 }) {
     const [householdMap, setHouseholdMap] = useState({});
 
@@ -58,7 +59,7 @@ export default function SimpleModal({
                     <button
                         onClick={onClose}
                         style={styles.buttonCancel}
-                        aria-label="Close modal"
+                        title="Close"
                         onMouseEnter={(e) =>
                             (e.currentTarget.style.backgroundColor = "#b0b0b0")
                         }
@@ -92,6 +93,9 @@ export default function SimpleModal({
                                         {product.name}{" "}
                                         <span style={styles.productQuantity}>
                                             ({product.quantity})
+                                        </span>
+                                        <span style={styles.productQuantity}>
+                                            {getSubcategoryName(product, subcategories)}
                                         </span>
                                     </span>
                                     <div style={styles.productButtons}>
@@ -163,6 +167,10 @@ export default function SimpleModal({
             {message && <div style={styles.message}>{message}</div>}
         </div>
     );
+}
+
+function getSubcategoryName(product, subcategories) {
+    return subcategories[product.subcategory_id]?.name || "";
 }
 
 const styles = {

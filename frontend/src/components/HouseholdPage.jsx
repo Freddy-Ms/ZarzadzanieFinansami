@@ -391,7 +391,7 @@ const HouseholdPage = () => {
                                         cursor: "pointer",
                                     }}
                                 >
-                                    Add household
+                                    Create household
                                 </button>
 
                                 <AddHouseholdModal

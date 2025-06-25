@@ -50,7 +50,7 @@ const AddHouseholdModal = ({ visible, onClose, onSuccess }) => {
         <div style={styles.modal}>
             <ToastContainer />
             <div style={styles.modalContent}>
-                <h3 style={styles.title}>Add New Household</h3>
+                <h3 style={styles.title}>Create New Household</h3>
                 <input
                     type="text"
                     placeholder="Household name"

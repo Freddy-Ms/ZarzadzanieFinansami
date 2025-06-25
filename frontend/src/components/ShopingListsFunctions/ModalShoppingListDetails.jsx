@@ -193,6 +193,7 @@ export default function ModalShoppingListDetails({ list, onClose, onUpdated }) {
                             setIsEditMode={setIsEditMode}
                             setProductId={setProductId}
                             handleDeleteProduct={handleDeleteProduct}
+                            subcategories={subcategories}
                         />
                     )}
                     {showExtendedModal && (
