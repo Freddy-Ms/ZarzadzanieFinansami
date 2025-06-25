@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     PieChart,
     Pie,
     Cell,
     Tooltip,
-    Legend,
     LineChart,
     Line,
     XAxis,
@@ -15,6 +14,8 @@ import {
 } from "recharts";
 import ShoppingLists from "./ShopingListsFunctions/ShopingListsFun";
 import { AuthContext } from "../protection/AuthProvider";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function HomePage() {
     const navigate = useNavigate();
@@ -41,10 +42,7 @@ export default function HomePage() {
                     body: JSON.stringify({ household_id: householdId || null }),
                 });
                 const data = await response.json();
-                if (!response.ok)
-                    throw new Error(
-                        data.message || "Error fetching prediction"
-                    );
+                if (!response.ok) throw new Error(data.message);
 
                 const historyArr = Object.entries(data.history).map(
                     ([month, spent]) => ({
@@ -60,14 +58,12 @@ export default function HomePage() {
                     predicted_total_next_month: data.predicted_total_next_month,
                 });
             } catch (err) {
-                console.error("Prediction fetch error:", err);
+                toast.error("Prediction fetch error:" + err.message);
             }
         }
-
         fetchPrediction();
     }, [householdId]);
 
-    // Pobranie podsumowania miesięcznego (kategorie do wykresu kołowego)
     useEffect(() => {
         async function fetchMonthlySummary() {
             try {
@@ -89,12 +85,8 @@ export default function HomePage() {
                     }
                 );
                 const data = await response.json();
-                if (!response.ok)
-                    throw new Error(
-                        data.message || "Error fetching monthly summary"
-                    );
+                if (!response.ok) throw new Error(data.message);
 
-                // Mapowanie podsumowania do formatu dla PieChart
                 const pieData = data.map((cat) => ({
                     name: cat.category,
                     value: cat.total,
@@ -102,7 +94,7 @@ export default function HomePage() {
 
                 setChartData(pieData);
             } catch (err) {
-                console.error("Monthly summary fetch error:", err);
+                toast.error("Monthly summary fetch error:" + err.message);
             }
         }
         fetchMonthlySummary();
@@ -115,6 +107,7 @@ export default function HomePage() {
 
     return (
         <div style={styles.container}>
+            <ToastContainer position="top-center" autoClose={3000} />
             <header
                 style={{
                     ...styles.topBar,
@@ -124,14 +117,7 @@ export default function HomePage() {
                 }}
             >
                 <h1 style={styles.logo}>Scanalyze</h1>
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "16px",
-                    }}
-                >
-                    {/* Ikona Paragonu */}
+                <div style={styles.navbar}>
                     <div
                         style={{ cursor: "pointer", width: 32, height: 32 }}
                         onClick={() => navigate("/purchaseEvent")}
@@ -153,7 +139,6 @@ export default function HomePage() {
                         </svg>
                     </div>
 
-                    {/* Ikona Household (domek) */}
                     <div
                         style={{ cursor: "pointer", width: 32, height: 32 }}
                         onClick={() => navigate("/household")}
@@ -172,7 +157,6 @@ export default function HomePage() {
                         </svg>
                     </div>
 
-                    {/* Ikona Profil */}
                     <div
                         style={{ cursor: "pointer", width: 32, height: 32 }}
                         onClick={() => navigate("/profile")}
@@ -192,7 +176,6 @@ export default function HomePage() {
                         </svg>
                     </div>
 
-                    {/* Ikona Wylogowania */}
                     <div
                         style={{ cursor: "pointer", width: 32, height: 32 }}
                         onClick={handleLogout}
@@ -331,58 +314,7 @@ function PredictionTile({ title, value }) {
     return (
         <div style={styles.predictionCard}>
             <h3 style={{ color: "black" }}>{title}</h3>
-            <p
-                style={{
-                    fontSize: "1.6rem",
-                    fontWeight: "bold",
-                    color: "black",
-                    marginTop: "1rem",
-                }}
-            >
-                {value}
-            </p>
-        </div>
-    );
-}
-
-function Dropdown({ title, items }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selected, setSelected] = useState(null);
-
-    const toggleDropdown = () => setIsOpen(!isOpen);
-
-    const handleSelect = (item) => {
-        setSelected(item);
-        setIsOpen(false);
-    };
-
-    return (
-        <div style={styles.spinnerContainer}>
-            <div
-                style={{
-                    ...styles.spinner,
-                    borderBottomLeftRadius: isOpen ? 0 : "8px",
-                    borderBottomRightRadius: isOpen ? 0 : "8px",
-                }}
-                onClick={toggleDropdown}
-            >
-                <span>{selected || title}</span>
-                <span style={styles.arrow}>{isOpen ? "▲" : "▼"}</span>
-            </div>
-
-            {isOpen && (
-                <div style={styles.spinnerDropdown}>
-                    {items.map((item, index) => (
-                        <div
-                            key={index}
-                            style={styles.spinnerItem}
-                            onClick={() => handleSelect(item)}
-                        >
-                            {item}
-                        </div>
-                    ))}
-                </div>
-            )}
+            <p style={styles.predictionValue}>{value}</p>
         </div>
     );
 }
@@ -409,7 +341,6 @@ const styles = {
         backgroundColor: "#c8dcfa",
         flex: 1,
     },
-
     sidebar: {
         display: "flex",
         flexDirection: "column",
@@ -420,7 +351,6 @@ const styles = {
         gap: "1rem",
         color: "black",
     },
-
     contentGrid: {
         display: "flex",
         gap: "20px",
@@ -428,20 +358,17 @@ const styles = {
         width: "100%",
         boxSizing: "border-box",
     },
-
     leftColumn: {
         flexBasis: "40%",
         display: "flex",
         flexDirection: "column",
     },
-
     rightColumn: {
         flex: 1,
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
     },
-
     chartCard: {
         backgroundColor: "white",
         borderRadius: "12px",
@@ -449,31 +376,38 @@ const styles = {
         boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
         marginBottom: "20px",
     },
-
     legendContainer: {
         display: "flex",
         flexDirection: "column",
         marginTop: 16,
         alignItems: "flex-start",
     },
-
     legendItem: {
         display: "flex",
         alignItems: "center",
         marginBottom: 6,
         color: "black",
     },
-
     predictionRow: {
         display: "flex",
         gap: "20px",
     },
-
     predictionCard: {
         backgroundColor: "white",
         borderRadius: "12px",
         padding: "16px",
         flex: 1,
         boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+    },
+    predictionValue: {
+        fontSize: "1.6rem",
+        fontWeight: "bold",
+        color: "black",
+        marginTop: "1rem",
+    },
+    navbar: {
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
     },
 };

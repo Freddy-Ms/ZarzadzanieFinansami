@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const JoinHouseholdPanel = ({ showModal, setShowModal, onSuccess }) => {
@@ -38,8 +38,8 @@ const JoinHouseholdPanel = ({ showModal, setShowModal, onSuccess }) => {
         if (tokenInput.trim()) {
             const success = await joinHousehold(tokenInput.trim());
             if (success) {
-                onSuccess?.(); // odświeżenie po sukcesie
-                setShowModal(false); // zamknięcie modala
+                onSuccess?.();
+                setShowModal(false);
                 setTokenInput("");
                 setMessage("");
             }

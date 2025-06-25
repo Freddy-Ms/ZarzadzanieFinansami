@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 function PurchaseLists({
     setShowViewPanel,
@@ -87,7 +87,7 @@ function PurchaseLists({
 
     useEffect(() => {
         fetchLists();
-    }, [selectedHousehold]);
+    });
 
     return (
         <div

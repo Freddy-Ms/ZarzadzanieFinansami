@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -77,8 +77,7 @@ export default function PurchaseEventPage() {
                                 />
                             ) : (
                                 <p>
-                                    ← Wybierz opcję po prawej stronie lub
-                                    kliknij "Add Purchased List".
+                                    ← Select an option on the right or click "Add Purchased List".
                                 </p>
                             )}
                         </div>

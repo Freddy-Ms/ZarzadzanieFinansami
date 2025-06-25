@@ -31,7 +31,7 @@ export default function ExtendedModal({
                 setSubcategoryId(product.subcategory_id || "");
             }
         }
-    }, [isEditMode, productId]);
+    });
 
     return (
         <div style={{ ...styles.modal, width: "420px" }}>

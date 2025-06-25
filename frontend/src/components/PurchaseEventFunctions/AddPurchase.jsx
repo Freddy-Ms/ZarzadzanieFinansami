@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 
 export default function AddPurchase({ onClose }) {
@@ -138,7 +138,7 @@ export default function AddPurchase({ onClose }) {
             }}
         >
             <h2 style={{ marginBottom: "10px", marginTop: 0 }}>
-                Dodaj listę zakupów
+                Add a shopping list
             </h2>
             <form
                 onSubmit={(e) => e.preventDefault()}
@@ -151,7 +151,7 @@ export default function AddPurchase({ onClose }) {
                 <input
                     ref={inputRef}
                     type="text"
-                    placeholder="Nazwa listy"
+                    placeholder="List name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     style={{
@@ -172,7 +172,7 @@ export default function AddPurchase({ onClose }) {
                         fontSize: "1rem",
                     }}
                 >
-                    <option value="private">Prywatna (tylko dla Ciebie)</option>
+                    <option value="private">Private (only for you)</option>
                     {households.map((h) => (
                         <option key={h.id} value={h.id}>
                             {h.name}
@@ -180,7 +180,6 @@ export default function AddPurchase({ onClose }) {
                     ))}
                 </select>
 
-                {/* Sekcja dodawania paragonu */}
                 {!receiptFile ? (
                     <div
                         style={{
@@ -212,7 +211,7 @@ export default function AddPurchase({ onClose }) {
                             }}
                             style={{ display: "none" }}
                         />
-                        <p>Kliknij lub przeciągnij tutaj obraz paragonu</p>
+                        <p>Click or drag receipt image here</p>
                     </div>
                 ) : (
                     <div
@@ -229,13 +228,13 @@ export default function AddPurchase({ onClose }) {
                         }}
                     >
                         <span style={{ fontSize: "1.25rem" }}>✔</span>
-                        <span>Paragon dodany: {receiptFile.name}</span>
+                        <span>Receipt added: {receiptFile.name}</span>
                     </div>
                 )}
 
                 {loadingOcr && (
                     <p style={{ fontStyle: "italic", color: "#888" }}>
-                        Przetwarzanie OCR...
+                        OCR processing...
                     </p>
                 )}
 
@@ -249,7 +248,7 @@ export default function AddPurchase({ onClose }) {
                         }}
                     >
                         <h4 style={{ marginBottom: "0.8rem", marginTop: 0 }}>
-                            Rozpoznane produkty:
+                            Recognized products:
                         </h4>
                         {ocrProducts.map((p, i) => (
                             <div
@@ -278,6 +277,7 @@ export default function AddPurchase({ onClose }) {
                                         padding: "0.3rem 0.7rem",
                                         cursor: "pointer",
                                     }}
+                                    title="Delete product"
                                     onClick={() => handleDeleteProduct(i)}
                                 >
                                     🗑️
@@ -307,7 +307,7 @@ export default function AddPurchase({ onClose }) {
                             cursor: "pointer",
                         }}
                     >
-                        Dodaj
+                        Add
                     </button>
                     <button
                         type="button"
@@ -321,7 +321,7 @@ export default function AddPurchase({ onClose }) {
                             color: "black",
                         }}
                     >
-                        Anuluj
+                        Cancel
                     </button>
                 </div>
             </form>

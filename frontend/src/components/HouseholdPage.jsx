@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,7 +9,6 @@ import AddHouseholdModal from "./HouseholdsFunctions/AddHouseholdModal";
 const HouseholdPage = () => {
     const navigate = useNavigate();
     const [household, setHousehold] = useState([]);
-    const [, setError] = useState(null);
     const [username, setUsername] = useState(null);
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [showInvite, setShowInvite] = useState(false);
@@ -40,10 +39,8 @@ const HouseholdPage = () => {
             }
 
             setHousehold(data);
-            setError(null);
         } catch (err) {
-            console.error("Error:", err.message);
-            setError(err.message);
+            toast.error("Error:" + err.message);
         }
     };
 
@@ -56,13 +53,13 @@ const HouseholdPage = () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || "Error downloading data");
+                throw new Error(errorData.message);
             }
 
             const userData = await response.json();
             return userData.username;
         } catch (err) {
-            console.error("Failed to fetch username:", err.message);
+            toast.error("Failed to fetch username:" + err.message);
             return null;
         }
     };
@@ -100,13 +97,9 @@ const HouseholdPage = () => {
             setEditHouseholdId(null);
             setEditHouseholdName("");
             await fetchUserHouseholds();
-            toast.success("Household successfully updated!", {
-                autoClose: 3000,
-            });
+            toast.success("Household successfully updated!");
         } catch (err) {
-            toast.error("Error: " + err.message, {
-                autoClose: 3000,
-            });
+            toast.error("Error: " + err.message);
         }
     };
 
@@ -133,14 +126,14 @@ const HouseholdPage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                toast.error(data.message, { autoClose: 3000 });
+                toast.error(data.message );
                 return;
             }
 
             await fetchUserHouseholds();
-            toast.success(data.message, { autoClose: 3000 });
+            toast.success(data.message );
         } catch (error) {
-            toast.error("Error: " + error.message, { autoClose: 3000 });
+            toast.error("Error: " + error.message );
         }
     };
 
@@ -486,7 +479,6 @@ const styles = {
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         color: "#1e293b",
     },
-
     outerContainer: {
         display: "flex",
         flexDirection: "column",
@@ -496,7 +488,6 @@ const styles = {
         margin: "0 auto",
         boxSizing: "border-box",
     },
-
     backButton: {
         backgroundColor: "#58a7fc",
         border: "none",
@@ -509,13 +500,11 @@ const styles = {
         alignSelf: "flex-start",
         transition: "background-color 0.3s ease",
     },
-
     hoverEffects: {
         backButtonHover: {
             backgroundColor: "#1d4ed8",
         },
     },
-
     twoColumnRow: {
         display: "flex",
         gap: "24px",
@@ -523,7 +512,6 @@ const styles = {
         alignItems: "stretch",
         flexWrap: "wrap",
     },
-
     panel: {
         backgroundColor: "#fff",
         borderRadius: "12px",
@@ -562,21 +550,18 @@ const styles = {
         cursor: "pointer",
         fontSize: "1rem",
     },
-
     householdCard: {
         border: "1px solid #ccc",
         borderRadius: "8px",
         padding: "16px",
         marginBottom: "16px",
     },
-
     buttonRow: {
         marginTop: "12px",
         display: "flex",
         flexWrap: "wrap",
         gap: "10px",
     },
-
     primaryButton: {
         backgroundColor: "#3b82f6",
         color: "#fff",
@@ -586,7 +571,6 @@ const styles = {
         cursor: "pointer",
         fontWeight: "600",
     },
-
     warningButton: {
         backgroundColor: "#f59e0b",
         color: "#fff",
@@ -596,7 +580,6 @@ const styles = {
         cursor: "pointer",
         fontWeight: "600",
     },
-
     dangerButton: {
         backgroundColor: "#ef4444",
         color: "#fff",
@@ -606,7 +589,6 @@ const styles = {
         cursor: "pointer",
         fontWeight: "600",
     },
-
     leaveButton: {
         backgroundColor: "#6b7280",
         color: "#fff",

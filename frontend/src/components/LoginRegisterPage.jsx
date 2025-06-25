@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,19 +7,16 @@ import { AuthContext } from "../protection/AuthProvider";
 export default function LoginRegisterPage() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [errorMsg, setErrorMsg] = useState("");
 
     const [regUsername, setRegUsername] = useState("");
     const [regEmail, setRegEmail] = useState("");
     const [regPassword, setRegPassword] = useState("");
-    const [registerMsg, setRegisterMsg] = useState("");
 
     const navigate = useNavigate();
     const { setIsAuthenticated } = useContext(AuthContext);
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setErrorMsg("");
 
         const payload = {
             password,
@@ -46,13 +43,12 @@ export default function LoginRegisterPage() {
                 navigate("/homepage");
             }
         } catch (error) {
-            console.error("Log in error:", error);
+            toast.error("Log in error:" + error.message);
         }
     };
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        setRegisterMsg("");
 
         const payload = {
             username: regUsername,
@@ -72,8 +68,6 @@ export default function LoginRegisterPage() {
             );
 
             const data = await response.json();
-            console.log("Response code:", response.status);
-            console.log("Message content:", data.message);
 
             if (response.status !== 201) {
                 toast.error("Registration error: " + data.message, {
@@ -85,7 +79,7 @@ export default function LoginRegisterPage() {
                 });
             }
         } catch (error) {
-            console.error("Registration error:", error);
+            toast.error("Registration error:" + error.message);
         }
     };
 
@@ -115,7 +109,6 @@ export default function LoginRegisterPage() {
                         <button type="submit" style={styles.button}>
                             Log In
                         </button>
-                        {errorMsg && <p style={styles.error}>{errorMsg}</p>}
                     </form>
                 </div>
                 <div style={{ ...styles.panel, backgroundColor: "#f0f8ff" }}>
@@ -148,9 +141,6 @@ export default function LoginRegisterPage() {
                         <button type="submit" style={styles.button}>
                             Register
                         </button>
-                        {registerMsg && (
-                            <p style={styles.error}>{registerMsg}</p>
-                        )}
                     </form>
                 </div>
             </div>
@@ -165,7 +155,7 @@ const styles = {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #e0f7fa, #fce4ec)",
+        background: "linear-gradient(135deg,rgb(109, 202, 252),rgb(138, 157, 255))",
         fontFamily: "'Segoe UI', sans-serif",
     },
     container: {

@@ -1,6 +1,5 @@
 import { toast, ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
-import SubcategoryCombo from "../ShopingListsFunctions/SubcategoryCombo";
 
 export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
     const [event, setEvent] = useState(null);
@@ -41,7 +40,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
 
     useEffect(() => {
         fetchEvent();
-    }, [editPurchaseID, userOrHouseholdID]);
+    });
 
     useEffect(() => {
         if (event && event.products) {
@@ -61,7 +60,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                         credentials: "include",
                     }
                 );
-                if (!res.ok) throw new Error("Błąd pobierania jednostek");
+                if (!res.ok) throw new Error("Error getting units");
                 const data = await res.json();
                 setUnits(data);
             } catch (error) {
@@ -82,7 +81,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                         credentials: "include",
                     }
                 );
-                if (!res.ok) throw new Error("Błąd pobierania podkategorii");
+                if (!res.ok) throw new Error("Error getting subcategory");
                 const data = await res.json();
                 setSubcategories(data);
             } catch (error) {
@@ -111,8 +110,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                     }
                 );
 
-                if (!response.ok)
-                    throw new Error("Nie udało się pobrać paragonu");
+                if (!response.ok) throw new Error("Failed to download receipt");
 
                 const blob = await response.blob();
                 imageUrl = URL.createObjectURL(blob);
@@ -165,7 +163,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
             if (foundEvent) {
                 setEvent(foundEvent);
             } else {
-                toast.error("Nie znaleziono zdarzenia zakupu o podanym ID");
+                toast.error("No purchase event found with the specified ID");
             }
         } catch (err) {
             toast.error(err.message);
@@ -227,7 +225,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                 throw new Error(data.message);
             }
 
-            toast.success("Zaktualizowano listę zakupów");
+            toast.success("Shopping list updated");
             setIsNameEditing(false);
             setEvent({ ...event, name, date });
         } catch (err) {
@@ -282,7 +280,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                 throw new Error(data.message);
             }
 
-            toast.success("Produkt usunięty");
+            toast.success("Product removed");
 
             setEvent((prevEvent) => ({
                 ...prevEvent,
@@ -296,25 +294,25 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
     const editPurchasedProduct = async (product) => {
         try {
             if (!product.name || product.name.trim() === "") {
-                toast.error("Nazwa nie może być pusta");
+                toast.error("Name cannot be empty");
             } else if (
                 !Number.isInteger(Number(product.quantity)) ||
                 Number(product.quantity) <= 0
             ) {
-                toast.error("Quantity musi być liczbą całkowitą większą od 0");
+                toast.error("Quantity must be an integer greater than 0");
             } else if (!product.unit_id) {
-                toast.error("Jednostka (unit) nie może być pusta");
+                toast.error("Unit cannot be empty");
             } else if (!product.subcategory_id) {
-                toast.error("Podkategoria (subcategory) nie może być pusta");
+                toast.error("Category cannot be empty");
             } else if (
                 product.price === null ||
                 product.price === undefined ||
                 product.price.toString().trim() === ""
             ) {
-                toast.error("Cena nie może być pusta");
+                toast.error("Price cannot be empty");
             } else if (!/^\d+([.,]\d{1,2})?$/.test(product.price.toString())) {
                 toast.error(
-                    "Cena musi być w poprawnym formacie (max 2 cyfry po przecinku)"
+                    "Price must be in a valid format (max 2 digits after the decimal point)"
                 );
             } else {
                 const response = await fetch(
@@ -342,7 +340,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                     throw new Error(data.message);
                 }
 
-                toast.success(`Zaktualizowano produkt`);
+                toast.success(`Product updated`);
                 await fetchEvent();
                 return true;
             }
@@ -387,27 +385,27 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
     const addPurchasedProduct = async (newProduct) => {
         try {
             if (!newProduct.name || newProduct.name.trim() === "") {
-                toast.error("Nazwa nie może być pusta");
+                toast.error("Name cannot be empty");
             } else if (
                 !Number.isInteger(Number(newProduct.quantity)) ||
                 Number(newProduct.quantity) <= 0
             ) {
-                toast.error("Quantity musi być liczbą całkowitą większą od 0");
+                toast.error("Quantity must be an integer greater than 0");
             } else if (!newProduct.unit_id) {
-                toast.error("Jednostka (unit) nie może być pusta");
+                toast.error("Unit cannot be empty");
             } else if (!newProduct.subcategory_id) {
-                toast.error("Podkategoria (subcategory) nie może być pusta");
+                toast.error("Category cannot be empty");
             } else if (
                 newProduct.price === null ||
                 newProduct.price === undefined ||
                 newProduct.price.toString().trim() === ""
             ) {
-                toast.error("Cena nie może być pusta");
+                toast.error("Price cannot be empty");
             } else if (
                 !/^\d+([.,]\d{1,2})?$/.test(newProduct.price.toString())
             ) {
                 toast.error(
-                    "Cena musi być w poprawnym formacie (max 2 cyfry po przecinku)"
+                    "The price must be in the correct format (max 2 digits after the decimal point)"
                 );
             } else {
                 const response = await fetch(
@@ -435,7 +433,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                     throw new Error(data.message);
                 }
 
-                toast.success(`Dodano nowy produkt`);
+                toast.success(`New product added`);
 
                 await fetchEvent();
                 return true;
@@ -473,25 +471,10 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
             <ToastContainer />
             {event ? (
                 <>
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: "10px",
-                        }}
-                    >
+                    <div style={styles.main}>
                         {isNameEditing ? (
                             <>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "6px",
-                                        minWidth: 0,
-                                        flexShrink: 1,
-                                    }}
-                                >
+                                <div style={styles.editingPurchaseName}>
                                     <input
                                         type="text"
                                         value={name}
@@ -499,26 +482,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                             setName(e.target.value)
                                         }
                                         placeholder="Enter name"
-                                        style={{
-                                            fontSize: "1.25rem",
-                                            fontWeight: "600",
-                                            color: "#1e293b",
-                                            padding: "8px 12px",
-                                            border: "1px solid #ccc",
-                                            borderRadius: "6px",
-                                            background: "#f7f7f7",
-                                            minWidth: "150px",
-                                            flexShrink: 1,
-                                        }}
+                                        style={styles.editName}
                                     />
-                                    <span
-                                        style={{
-                                            fontSize: "1rem",
-                                            color: "gray",
-                                            fontWeight: "400",
-                                            whiteSpace: "nowrap",
-                                        }}
-                                    >
+                                    <span style={styles.spanStyle}>
                                         ({ownerName})
                                     </span>
                                 </div>
@@ -527,16 +493,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    style={{
-                                        fontSize: "1rem",
-                                        padding: "8px 12px",
-                                        borderRadius: "6px",
-                                        border: "1px solid #ccc",
-                                        background: "#f7f7f7",
-                                        color: "black",
-                                        minWidth: "130px",
-                                        WebkitAppearance: "none",
-                                    }}
+                                    style={styles.editDate}
                                 />
                                 <div
                                     style={{
@@ -545,32 +502,14 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                     }}
                                 >
                                     <button
-                                        style={{
-                                            backgroundColor: "#8a8a8a",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "6px",
-                                            padding: "0.5rem 1rem",
-                                            cursor: "pointer",
-                                            fontSize: "1rem",
-                                            whiteSpace: "nowrap",
-                                        }}
+                                        style={styles.cancelButton}
                                         onClick={() => setIsNameEditing(false)}
                                     >
                                         Cancel
                                     </button>
 
                                     <button
-                                        style={{
-                                            backgroundColor: "#1e8f1d",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "6px",
-                                            padding: "0.5rem 1rem",
-                                            cursor: "pointer",
-                                            fontSize: "1rem",
-                                            whiteSpace: "nowrap",
-                                        }}
+                                        style={styles.saveButton}
                                         onClick={handleSave}
                                     >
                                         Save
@@ -579,36 +518,10 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                             </>
                         ) : (
                             <>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "6px",
-                                        minWidth: 0,
-                                        flexShrink: 1,
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                    }}
-                                >
-                                    <h2
-                                        style={{
-                                            margin: 0,
-                                            fontWeight: "600",
-                                            color: "#1e293b",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "6px",
-                                        }}
-                                    >
+                                <div style={styles.purchaseName}>
+                                    <h2 style={styles.name}>
                                         {event.name}{" "}
-                                        <span
-                                            style={{
-                                                fontSize: "0.85em",
-                                                color: "gray",
-                                                fontWeight: "400",
-                                            }}
-                                        >
+                                        <span style={styles.spanStyle2}>
                                             ({ownerName})
                                         </span>
                                     </h2>
@@ -636,16 +549,8 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                     }}
                                 >
                                     <button
-                                        style={{
-                                            backgroundColor: "#007bff",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "6px",
-                                            padding: "0.5rem 1rem",
-                                            cursor: "pointer",
-                                            fontSize: "1rem",
-                                            whiteSpace: "nowrap",
-                                        }}
+                                        style={styles.edditButton}
+                                        title="Edit product"
                                         onClick={() => {
                                             setIsNameEditing(true);
                                         }}
@@ -653,16 +558,8 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                         ✏️
                                     </button>
                                     <button
-                                        style={{
-                                            backgroundColor: "#ff0000",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "6px",
-                                            padding: "0.5rem 1rem",
-                                            cursor: "pointer",
-                                            fontSize: "1rem",
-                                            whiteSpace: "nowrap",
-                                        }}
+                                        style={styles.deleteButton}
+                                        title="Delete product"
                                         onClick={() => {
                                             deletePurchaseEvent(editPurchaseID);
                                         }}
@@ -674,15 +571,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                         )}
                     </div>
                     {products && products.length > 0 && (
-                        <div
-                            style={{
-                                backgroundColor: "#d9ebff",
-                                padding: "1rem 0.5rem",
-                                borderRadius: "8px",
-                                overflowY: "auto",
-                                marginTop: "1rem",
-                            }}
-                        >
+                        <div style={styles.productsList}>
                             <h4
                                 style={{
                                     marginBottom: "0.3rem",
@@ -697,19 +586,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                         <>
                                             <div
                                                 key={product.id}
-                                                style={{
-                                                    display: "flex",
-                                                    justifyContent:
-                                                        "space-between",
-                                                    alignItems: "center",
-                                                    backgroundColor: "#fff",
-                                                    padding: "0.6rem 1rem",
-                                                    borderRadius: "6px",
-                                                    marginBottom: "0.5rem",
-                                                    boxShadow:
-                                                        "0 1px 3px rgba(0,0,0,0.1)",
-                                                    gap: "1rem",
-                                                }}
+                                                style={styles.products}
                                             >
                                                 <input
                                                     type="text"
@@ -717,22 +594,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     value={editedProduct.name}
                                                     onChange={handleInputChange}
                                                     placeholder="Product name"
-                                                    style={{
-                                                        flex: "1 1 150px",
-                                                        backgroundColor:
-                                                            "#f0f8ff",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(0,123,255,0.3)",
-                                                        fontWeight: "800",
-                                                        border: "none",
-                                                        outline: "none",
-                                                        width: "100%",
-                                                        color: "black",
-                                                        fontFamily:
-                                                            "Consolas, monospace",
-                                                    }}
+                                                    style={
+                                                        styles.editNameProduct
+                                                    }
                                                 />
 
                                                 <input
@@ -743,22 +607,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     }
                                                     onChange={handleInputChange}
                                                     placeholder="Quantity"
-                                                    style={{
-                                                        flex: "0 0 70px",
-                                                        backgroundColor:
-                                                            "#f9f9f9",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(100,100,100,0.1)",
-                                                        fontWeight: "800",
-                                                        border: "none",
-                                                        outline: "none",
-                                                        width: "100%",
-                                                        color: "black",
-                                                        fontFamily:
-                                                            "Consolas, monospace",
-                                                    }}
+                                                    style={
+                                                        styles.editQuantityProduct
+                                                    }
                                                     min="0"
                                                 />
 
@@ -769,25 +620,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                         ""
                                                     }
                                                     onChange={handleInputChange}
-                                                    style={{
-                                                        flex: "0 0 80px",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        border: "none",
-                                                        width: "65px",
-                                                        backgroundColor:
-                                                            "#f9f9f9",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(100,100,100,0.1)",
-                                                        color: "black",
-                                                        outline: "none",
-                                                        fontFamily:
-                                                            "Consolas, monospace",
-                                                        whiteSpace: "nowrap",
-                                                        overflow: "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                    }}
+                                                    style={
+                                                        styles.editUnitProduct
+                                                    }
                                                 >
                                                     <option value="" disabled>
                                                         Unit
@@ -809,24 +644,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                         ""
                                                     }
                                                     onChange={handleInputChange}
-                                                    style={{
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        border: "none",
-                                                        flex: "0 0 30px",
-                                                        width: "165px",
-                                                        backgroundColor:
-                                                            "#fff8dc",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(218,165,32,0.3)",
-                                                        whiteSpace: "nowrap",
-                                                        overflow: "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                        color: "black",
-                                                        fontFamily:
-                                                            "Consolas, monospace",
-                                                    }}
+                                                    style={
+                                                        styles.editCategoryProduct
+                                                    }
                                                 >
                                                     <option value="" disabled>
                                                         Select category
@@ -850,22 +670,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     value={editedProduct.price}
                                                     onChange={handleInputChange}
                                                     placeholder="Price"
-                                                    style={{
-                                                        flex: "0 0 70px",
-                                                        backgroundColor:
-                                                            "#f0fff0",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(0,128,0,0.2)",
-                                                        fontFamily:
-                                                            "Consolas, monospace",
-                                                        fontWeight: "800",
-                                                        border: "none",
-                                                        outline: "none",
-                                                        width: "100%",
-                                                        color: "black",
-                                                    }}
+                                                    style={
+                                                        styles.editPriceProduct
+                                                    }
                                                     min="0.01"
                                                 />
                                                 <div
@@ -875,16 +682,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     }}
                                                 >
                                                     <button
-                                                        style={{
-                                                            backgroundColor:
-                                                                "#007bff",
-                                                            color: "#fff",
-                                                            border: "none",
-                                                            borderRadius: "4px",
-                                                            padding:
-                                                                "0.3rem 0.7rem",
-                                                            cursor: "pointer",
-                                                        }}
+                                                        style={
+                                                            styles.saveButton
+                                                        }
                                                         onClick={
                                                             handleSaveClick
                                                         }
@@ -892,16 +692,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                         Save
                                                     </button>
                                                     <button
-                                                        style={{
-                                                            backgroundColor:
-                                                                "#ff0000",
-                                                            color: "#fff",
-                                                            border: "none",
-                                                            borderRadius: "4px",
-                                                            padding:
-                                                                "0.3rem 0.7rem",
-                                                            cursor: "pointer",
-                                                        }}
+                                                        style={
+                                                            styles.cancelButton
+                                                        }
                                                         onClick={() =>
                                                             setEditingProductId(
                                                                 null
@@ -917,69 +710,19 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                         <>
                                             <div
                                                 key={product.id}
-                                                style={{
-                                                    display: "flex",
-                                                    justifyContent:
-                                                        "space-between",
-                                                    alignItems: "center",
-                                                    backgroundColor: "#fff",
-                                                    padding: "0.6rem 1rem",
-                                                    borderRadius: "6px",
-                                                    marginBottom: "0.5rem",
-                                                    boxShadow:
-                                                        "0 1px 3px rgba(0,0,0,0.1)",
-                                                    gap: "1rem",
-                                                }}
+                                                style={styles.products}
                                             >
-                                                <div
-                                                    style={{
-                                                        flex: "1 1 150px",
-                                                        backgroundColor:
-                                                            "#f0f8ff",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(0,123,255,0.3)",
-                                                        fontWeight: "600",
-                                                    }}
-                                                >
+                                                <div style={styles.nameProduct}>
                                                     {product.name}
                                                 </div>
                                                 <div
-                                                    style={{
-                                                        flex: "0 0 20px",
-                                                        backgroundColor:
-                                                            "#f9f9f9",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(100,100,100,0.1)",
-                                                        textAlign: "center",
-                                                        width: "auto",
-                                                        minWidth: "10px",
-                                                    }}
+                                                    style={
+                                                        styles.quantityProduct
+                                                    }
                                                 >
                                                     {product.quantity}
                                                 </div>
-                                                <div
-                                                    style={{
-                                                        flex: "0 0 20px",
-                                                        backgroundColor:
-                                                            "#f9f9f9",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(100,100,100,0.1)",
-                                                        textAlign: "center",
-                                                        width: "auto",
-                                                        minWidth: "40px",
-                                                        whiteSpace: "nowrap",
-                                                        overflow: "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                        cursor: "default",
-                                                    }}
-                                                >
+                                                <div style={styles.unitProduct}>
                                                     {units.find(
                                                         (u) =>
                                                             u.id ===
@@ -987,23 +730,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     )?.name || "-"}
                                                 </div>
                                                 <div
-                                                    style={{
-                                                        flex: "1 1 0px",
-                                                        backgroundColor:
-                                                            "#fff8dc",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(218,165,32,0.3)",
-                                                        textAlign: "center",
-                                                        width: "auto",
-                                                        minWidth: "10px",
-                                                        whiteSpace: "nowrap",
-                                                        overflow: "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                        cursor: "default",
-                                                    }}
+                                                    style={
+                                                        styles.categoryProduct
+                                                    }
                                                 >
                                                     {subcategories.find(
                                                         (s) =>
@@ -1012,18 +741,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     )?.name || "-"}
                                                 </div>
                                                 <div
-                                                    style={{
-                                                        flex: "0 0 100px",
-                                                        backgroundColor:
-                                                            "#f0fff0",
-                                                        padding: "0.5rem",
-                                                        borderRadius: "6px",
-                                                        boxShadow:
-                                                            "inset 0 0 5px rgba(0,128,0,0.2)",
-                                                        textAlign: "center",
-                                                        fontWeight: "600",
-                                                        color: "#090",
-                                                    }}
+                                                    style={styles.priceProduct}
                                                 >
                                                     {product.price} zł
                                                 </div>
@@ -1035,16 +753,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                     }}
                                                 >
                                                     <button
-                                                        style={{
-                                                            backgroundColor:
-                                                                "#007bff",
-                                                            color: "#fff",
-                                                            border: "none",
-                                                            borderRadius: "4px",
-                                                            padding:
-                                                                "0.3rem 0.7rem",
-                                                            cursor: "pointer",
-                                                        }}
+                                                        style={
+                                                            styles.editButton
+                                                        }
                                                         onClick={() => {
                                                             handleEditClick(
                                                                 product
@@ -1054,16 +765,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                                         ✏️
                                                     </button>
                                                     <button
-                                                        style={{
-                                                            backgroundColor:
-                                                                "#ff0000",
-                                                            color: "#fff",
-                                                            border: "none",
-                                                            borderRadius: "4px",
-                                                            padding:
-                                                                "0.3rem 0.7rem",
-                                                            cursor: "pointer",
-                                                        }}
+                                                        style={
+                                                            styles.deleteButton
+                                                        }
                                                         onClick={() =>
                                                             removeProduct(
                                                                 product.id
@@ -1082,40 +786,14 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                     )}
 
                     {isAddingProduct ? (
-                        <div
-                            style={{
-                                marginTop: "1rem",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                backgroundColor: "rgba(29, 111, 225, 0.8)",
-                                padding: "0.6rem 1rem",
-                                borderRadius: "6px",
-                                marginBottom: "0.5rem",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                                gap: "1rem",
-                            }}
-                        >
+                        <div style={styles.addProductPanel}>
                             <input
                                 type="text"
                                 name="name"
                                 value={newProduct.name}
                                 onChange={handleNewProductInputChange}
                                 placeholder="Product name"
-                                style={{
-                                    flex: "1 1 150px",
-                                    backgroundColor: "#f0f8ff",
-                                    padding: "0.5rem",
-                                    borderRadius: "6px",
-                                    boxShadow:
-                                        "inset 0 0 5px rgba(0,123,255,0.3)",
-                                    fontWeight: "800",
-                                    border: "none",
-                                    outline: "none",
-                                    width: "100%",
-                                    color: "black",
-                                    fontFamily: "Consolas, monospace",
-                                }}
+                                style={styles.editNameProduct}
                             />
 
                             <input
@@ -1124,43 +802,15 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                 value={newProduct.quantity}
                                 onChange={handleNewProductInputChange}
                                 placeholder="Quantity"
-                                style={{
-                                    flex: "0 0 70px",
-                                    backgroundColor: "#f9f9f9",
-                                    padding: "0.5rem",
-                                    borderRadius: "6px",
-                                    boxShadow:
-                                        "inset 0 0 5px rgba(100,100,100,0.1)",
-                                    fontWeight: "800",
-                                    border: "none",
-                                    outline: "none",
-                                    width: "100%",
-                                    color: "black",
-                                    fontFamily: "Consolas, monospace",
-                                }}
-                                min="0"
+                                style={styles.editQuantityProduct}
+                                min="1"
                             />
 
                             <select
                                 name="unit_id"
                                 value={newProduct.unit_id || ""}
                                 onChange={handleNewProductInputChange}
-                                style={{
-                                    flex: "0 0 80px",
-                                    padding: "0.5rem",
-                                    borderRadius: "6px",
-                                    border: "none",
-                                    width: "65px",
-                                    backgroundColor: "#f9f9f9",
-                                    boxShadow:
-                                        "inset 0 0 5px rgba(100,100,100,0.1)",
-                                    color: "black",
-                                    outline: "none",
-                                    fontFamily: "Consolas, monospace",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                }}
+                                style={styles.editUnitProduct}
                             >
                                 <option value="" disabled>
                                     Unit
@@ -1176,21 +826,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                 name="subcategory_id"
                                 value={newProduct.subcategory_id || ""}
                                 onChange={handleNewProductInputChange}
-                                style={{
-                                    padding: "0.5rem",
-                                    borderRadius: "6px",
-                                    border: "none",
-                                    flex: "0 0 30px",
-                                    width: "165px",
-                                    backgroundColor: "#fff8dc",
-                                    boxShadow:
-                                        "inset 0 0 5px rgba(218,165,32,0.3)",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    color: "black",
-                                    fontFamily: "Consolas, monospace",
-                                }}
+                                style={styles.editCategoryProduct}
                             >
                                 <option value="" disabled>
                                     Select category
@@ -1207,20 +843,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                                 value={newProduct.price}
                                 onChange={handleNewProductInputChange}
                                 placeholder="Price"
-                                style={{
-                                    flex: "0 0 70px",
-                                    backgroundColor: "#f0fff0",
-                                    padding: "0.5rem",
-                                    borderRadius: "6px",
-                                    boxShadow:
-                                        "inset 0 0 5px rgba(0,128,0,0.2)",
-                                    fontFamily: "Consolas, monospace",
-                                    fontWeight: "800",
-                                    border: "none",
-                                    outline: "none",
-                                    width: "100%",
-                                    color: "black",
-                                }}
+                                style={styles.editPriceProduct}
                                 min="0.01"
                             />
                             <div
@@ -1267,17 +890,9 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                         >
                             <button
                                 onClick={() => setisAddingProduct(true)}
-                                style={{
-                                    padding: "0.5rem 1rem",
-                                    backgroundColor: "#007bff",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: "6px",
-                                    cursor: "pointer",
-                                    fontSize: "1rem",
-                                }}
+                                style={styles.addButton}
                             >
-                                Dodaj produkt
+                                Add product
                             </button>
                         </div>
                     )}
@@ -1293,7 +908,7 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                         >
                             <img
                                 src={receiptUrl}
-                                alt="Paragon"
+                                alt="Receipt"
                                 style={{
                                     maxWidth: "100%",
                                     maxHeight: "600px",
@@ -1304,13 +919,285 @@ export default function ShowPurchase({ editPurchaseID, userOrHouseholdID }) {
                         </div>
                     ) : (
                         <p style={{ textAlign: "center" }}>
-                            Brak zdjęcia paragonu lub trwa ładowanie...
+                            No receipt photo or loading...
                         </p>
                     )}
                 </>
             ) : (
-                <p>Ładowanie...</p>
+                <p>Loading...</p>
             )}
         </div>
     );
 }
+
+const styles = {
+    main: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "10px",
+    },
+    editingPurchaseName: {
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        minWidth: 0,
+        flexShrink: 1,
+    },
+
+    editName: {
+        fontSize: "1.25rem",
+        fontWeight: "600",
+        color: "#1e293b",
+        padding: "8px 12px",
+        border: "1px solid #ccc",
+        borderRadius: "6px",
+        background: "#f7f7f7",
+        minWidth: "150px",
+        flexShrink: 1,
+    },
+    spanStyle: {
+        fontSize: "1rem",
+        color: "gray",
+        fontWeight: "400",
+        whiteSpace: "nowrap",
+    },
+
+    editDate: {
+        fontSize: "1rem",
+        padding: "8px 12px",
+        borderRadius: "6px",
+        border: "1px solid #ccc",
+        background: "#f7f7f7",
+        color: "black",
+        minWidth: "130px",
+        WebkitAppearance: "none",
+    },
+
+    cancelButton: {
+        backgroundColor: "#8a8a8a",
+        color: "#fff",
+        border: "none",
+        borderRadius: "6px",
+        padding: "0.5rem 1rem",
+        cursor: "pointer",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+    },
+    saveButton: {
+        backgroundColor: "#1e8f1d",
+        color: "#fff",
+        border: "none",
+        borderRadius: "6px",
+        padding: "0.5rem 1rem",
+        cursor: "pointer",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+    },
+    purchaseaName: {
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        minWidth: 0,
+        flexShrink: 1,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+    },
+    name: {
+        margin: 0,
+        fontWeight: "600",
+        color: "#1e293b",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+    },
+    spanStyle2: {
+        fontSize: "0.85em",
+        color: "gray",
+        fontWeight: "400",
+    },
+    editButton: {
+        backgroundColor: "#007bff",
+        color: "#fff",
+        border: "none",
+        borderRadius: "6px",
+        padding: "0.5rem 1rem",
+        cursor: "pointer",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+    },
+    deleteButton: {
+        backgroundColor: "#ff0000",
+        color: "#fff",
+        border: "none",
+        borderRadius: "6px",
+        padding: "0.5rem 1rem",
+        cursor: "pointer",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+    },
+    productsList: {
+        backgroundColor: "#d9ebff",
+        padding: "1rem 0.5rem",
+        borderRadius: "8px",
+        overflowY: "auto",
+        marginTop: "1rem",
+    },
+    products: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "#fff",
+        padding: "0.6rem 1rem",
+        borderRadius: "6px",
+        marginBottom: "0.5rem",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        gap: "1rem",
+    },
+    editNameProduct: {
+        flex: "1 1 150px",
+        backgroundColor: "#f0f8ff",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(0,123,255,0.3)",
+        fontWeight: "800",
+        border: "none",
+        outline: "none",
+        width: "100%",
+        color: "black",
+        fontFamily: "Consolas, monospace",
+    },
+    editQuantityProduct: {
+        flex: "0 0 70px",
+        backgroundColor: "#f9f9f9",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(100,100,100,0.1)",
+        fontWeight: "800",
+        border: "none",
+        outline: "none",
+        width: "100%",
+        color: "black",
+        fontFamily: "Consolas, monospace",
+    },
+    editUnitProduct: {
+        flex: "0 0 80px",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        border: "none",
+        width: "65px",
+        backgroundColor: "#f9f9f9",
+        boxShadow: "inset 0 0 5px rgba(100,100,100,0.1)",
+        color: "black",
+        outline: "none",
+        fontFamily: "Consolas, monospace",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+    },
+    editCategoryProduct: {
+        padding: "0.5rem",
+        borderRadius: "6px",
+        border: "none",
+        flex: "0 0 30px",
+        width: "165px",
+        backgroundColor: "#fff8dc",
+        boxShadow: "inset 0 0 5px rgba(218,165,32,0.3)",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        color: "black",
+        fontFamily: "Consolas, monospace",
+    },
+    editPriceProduct: {
+        flex: "0 0 70px",
+        backgroundColor: "#f0fff0",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(0,128,0,0.2)",
+        fontFamily: "Consolas, monospace",
+        fontWeight: "800",
+        border: "none",
+        outline: "none",
+        width: "100%",
+        color: "black",
+    },
+    nameProduct: {
+        flex: "1 1 150px",
+        backgroundColor: "#f0f8ff",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(0,123,255,0.3)",
+        fontWeight: "600",
+    },
+    quantityProduct: {
+        flex: "0 0 20px",
+        backgroundColor: "#f9f9f9",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(100,100,100,0.1)",
+        textAlign: "center",
+        width: "auto",
+        minWidth: "10px",
+    },
+    unitProduct: {
+        flex: "0 0 20px",
+        backgroundColor: "#f9f9f9",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(100,100,100,0.1)",
+        textAlign: "center",
+        width: "auto",
+        minWidth: "40px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        cursor: "default",
+    },
+    categoryProduct: {
+        flex: "1 1 0px",
+        backgroundColor: "#fff8dc",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(218,165,32,0.3)",
+        textAlign: "center",
+        width: "auto",
+        minWidth: "10px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        cursor: "default",
+    },
+    priceProduct: {
+        flex: "0 0 100px",
+        backgroundColor: "#f0fff0",
+        padding: "0.5rem",
+        borderRadius: "6px",
+        boxShadow: "inset 0 0 5px rgba(0,128,0,0.2)",
+        textAlign: "center",
+        fontWeight: "600",
+        color: "#090",
+    },
+    addProductPanel: {
+        marginTop: "1rem",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "rgba(29, 111, 225, 0.8)",
+        padding: "0.6rem 1rem",
+        borderRadius: "6px",
+        marginBottom: "0.5rem",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        gap: "1rem",
+    },
+    addButton: {
+        padding: "0.5rem 1rem",
+        backgroundColor: "#007bff",
+        color: "#fff",
+        border: "none",
+        borderRadius: "6px",
+        cursor: "pointer",
+        fontSize: "1rem",
+    },
+};

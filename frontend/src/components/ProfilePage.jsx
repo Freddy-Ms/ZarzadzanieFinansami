@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -31,7 +31,7 @@ const ProfilePage = () => {
 
             const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.message || "Error downloading data");
+                throw new Error(data.message);
             }
 
             setUser(data);
@@ -55,11 +55,11 @@ const ProfilePage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Błąd pobierania householdów");
+                throw new Error(data.message);
             }
             return data;
         } catch (err) {
-            console.error("Błąd:", err.message);
+            toast.error("Error:", err.message);
             return null;
         }
     };
@@ -100,7 +100,7 @@ const ProfilePage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Error while writing data");
+                throw new Error(data.message);
             }
 
             toast.success(data.message, { autoClose: 3000 });
@@ -127,7 +127,7 @@ const ProfilePage = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Error deleting account");
+                throw new Error(data.message);
             }
 
             toast.success("Account deleted successfully", { autoClose: 3000 })
