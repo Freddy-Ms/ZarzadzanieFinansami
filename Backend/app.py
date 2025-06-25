@@ -377,6 +377,7 @@ def ocr_receipt():
                 'unit_id': None  
             })
 
+        print({'message': 'OCR processed successfully', 'products': products})
         return jsonify({'message': 'OCR processed successfully', 'products': products}), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 500
