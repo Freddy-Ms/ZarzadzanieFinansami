@@ -92,8 +92,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
         for (i in 0 until products.length()) {
             val product = products.getJSONObject(i)
 
-            val itemView =
-                layoutInflater.inflate(R.layout.item_product_editable, productListLayout, false)
+            val itemView = layoutInflater.inflate(R.layout.item_product_editable, productListLayout, false)
 
             val nameInput = itemView.findViewById<EditText>(R.id.productNameEditText)
             val quantityInput = itemView.findViewById<EditText>(R.id.productQuantityEditText)
@@ -106,14 +105,28 @@ class CreatePurchaseActivity : AppCompatActivity() {
             quantityInput.setText(product.optDouble("quantity", 1.0).toString())
             priceInput.setText(product.getDouble("price").toString())
 
+            val unitsListWithNull = listOf(null to "Uncategorized") + unitsList
+            val subcategoryListWithNull = listOf(null to "Uncategorized") + subcategoryList
+
             unitSpinner.adapter = ArrayAdapter(
                 this,
                 R.layout.spinner_item,
-                unitsList.map { it.second })
+                unitsListWithNull.map { it.second }
+            )
             subcategorySpinner.adapter = ArrayAdapter(
                 this,
                 R.layout.spinner_item,
-                subcategoryList.map { it.second })
+                subcategoryListWithNull.map { it.second }
+            )
+
+            val unitIdFromBackend = product.optInt("unit_id", -1)
+            val subcategoryIdFromBackend = product.optInt("subcategory_id", -1)
+
+            val unitIndex = unitsListWithNull.indexOfFirst { it.first == unitIdFromBackend }
+            val subcategoryIndex = subcategoryListWithNull.indexOfFirst { it.first == subcategoryIdFromBackend }
+
+            unitSpinner.setSelection(if (unitIndex >= 0) unitIndex else 0)
+            subcategorySpinner.setSelection(if (subcategoryIndex >= 0) subcategoryIndex else 0)
 
             removeButton.setOnClickListener {
                 productListLayout.removeView(itemView)
@@ -122,6 +135,7 @@ class CreatePurchaseActivity : AppCompatActivity() {
             productListLayout.addView(itemView)
         }
     }
+
 
     private fun savePurchase() {
         val purchaseName = purchaseNameInput.text.toString().trim()

@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Product name"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:textColor="@color/black"/>
 
     <!-- Ilość -->
     <EditText
@@ -22,14 +23,16 @@
         android:layout_height="wrap_content"
         android:hint="Quantity"
         android:inputType="numberDecimal"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textColor="@color/black"/>
 
     <!-- Spinner: Jednostka -->
     <Spinner
         android:id="@+id/unitSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textColor="@color/black"/>
 
     <!-- Spinner: Kategoria -->
     <Spinner

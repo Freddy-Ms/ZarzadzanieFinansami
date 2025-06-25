@@ -39,8 +39,7 @@
     <Spinner
         android:id="@+id/unitSpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black"/>
+        android:layout_height="wrap_content" />
 
     <TextView
         android:layout_width="match_parent"
@@ -51,8 +50,7 @@
     <Spinner
         android:id="@+id/subcategorySpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black"/>
+        android:layout_height="wrap_content" />
     <Button
         android:id="@+id/removeProductButton"
         android:layout_width="wrap_content"

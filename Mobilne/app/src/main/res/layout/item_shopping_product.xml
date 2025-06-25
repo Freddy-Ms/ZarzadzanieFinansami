@@ -10,14 +10,16 @@
         android:id="@+id/productNameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Product name" />
+        android:hint="Product name"
+        android:textColor="@color/black"/>
 
     <EditText
         android:id="@+id/productQuantityEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Quantity"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        android:textColor="@color/black"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

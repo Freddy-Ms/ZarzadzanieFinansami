@@ -64,6 +64,10 @@ object ApiClient {
     fun init(context: android.content.Context) {
         client = OkHttpClient.Builder()
             .cookieJar(PersistentCookieJar(context))
+            .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // czas na nawiązanie połączenia
+            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)    // czas na odczyt odpowiedzi
+            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)   // czas na wysłanie zapytania
             .build()
     }
+
 }
