@@ -110,7 +110,13 @@ class EditPurchaseActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 val body = response.body?.string() ?: return
-                val event = JSONObject(body).optJSONArray("events")?.optJSONObject(0) ?: return
+                val eventsArray = JSONObject(body).optJSONArray("events") ?: return
+                val event = (0 until eventsArray.length())
+                    .asSequence()
+                    .map { eventsArray.getJSONObject(it) }
+                    .firstOrNull { it.optInt("id") == purchaseId }
+                    ?: return
+
 
                 val name = event.optString("name", "")
                 val products = event.optJSONArray("products") ?: JSONArray()
